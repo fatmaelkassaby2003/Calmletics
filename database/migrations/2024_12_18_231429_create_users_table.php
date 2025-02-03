@@ -21,8 +21,10 @@ return new class extends Migration
             $table->float('score')->default(0);
             $table->string('code')->nullable()->unique();
             $table->unsignedBigInteger('com_free_id')->nullable();
+            $table->unsignedBigInteger('com_pres_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->foreign('com_pres_id')->references('id')->on('com_pres')->onDelete('set null'); 
             $table->foreign('com_free_id')->references('id')->on('com_free')->onDelete('set null'); 
         });
     }

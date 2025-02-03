@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendVerificationCode;
 class ForgotPasswordController extends Controller
@@ -46,10 +45,6 @@ class ForgotPasswordController extends Controller
             ], 500);
         }
     }
-=======
-class ForgotPasswordController extends Controller
-{
->>>>>>> 72322d1e17272618aae7f9bb2401cd1fb28d9351
 
 
     public function sendCode(Request $request)

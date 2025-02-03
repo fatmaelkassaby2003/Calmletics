@@ -35,10 +35,7 @@ Route::post('/coach/logout', [CoachController::class, 'logout'])->middleware('jw
 Route::post('sendCode', [ForgotPasswordController::class, 'sendCode']);
 Route::post('vertifyCode', [ForgotPasswordController::class, 'vertifyCode']);
 Route::post('resetPassword', [ForgotPasswordController::class, 'resetPassword']);
-<<<<<<< HEAD
 Route::post('send-verification-code', [ForgotPasswordController::class, 'sendemailcode']);
-=======
->>>>>>> 72322d1e17272618aae7f9bb2401cd1fb28d9351
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

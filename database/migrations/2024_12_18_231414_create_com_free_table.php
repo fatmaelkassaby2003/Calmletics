@@ -14,10 +14,7 @@ return new class extends Migration
         Schema::create('com_free', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-<<<<<<< HEAD
             $table->string('level');
-=======
->>>>>>> 72322d1e17272618aae7f9bb2401cd1fb28d9351
             $table->timestamps();
         });
     }

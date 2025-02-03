@@ -52,7 +52,17 @@ class User extends Authenticatable implements JWTSubject
 
     public function comFree()
     {
-        return $this->belongsTo(ComFree::class, 'com_free_id');
+        return $this->belongsTo(ComFree::class);
+    }
+
+    public function comPres()
+    {
+        return $this->belongsTo(ComFree::class);
+    }
+
+    public function sessions()
+    {
+        return $this->belongsToMany(Session::class)->withPivot('created_at');
     }
 
     public function getJWTCustomClaims()

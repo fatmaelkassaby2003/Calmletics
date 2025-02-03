@@ -62,21 +62,12 @@ public function updateScore(Request $request)
         public function score(Request $request)
     {
         $topUsers = User::orderBy('score', 'desc')
-<<<<<<< HEAD
                          ->select('name', 'score') 
                         //  ->pluck('name');
                          //->get(); 
     //                      $topUsers = User::orderBy('score', 'desc')
     //                  ->take(3)
                      ->get();
-=======
-                         //->select('name', 'score') 
-                         ->pluck('name');
-                         //->get(); 
-    //                      $topUsers = User::orderBy('score', 'desc')
-    //                  ->take(3)
-    //                  ->get(['name', 'score']);
->>>>>>> 72322d1e17272618aae7f9bb2401cd1fb28d9351
 
     // return response()->json($topUsers);
         return response()->json($topUsers);
