@@ -9,7 +9,7 @@ use App\Http\Controllers\player\ProfileController;
 use App\Http\Controllers\plans\PlandatesController;
 use App\Http\Controllers\player\FreeCommunityController;
 use App\Http\Controllers\player\HomeController;
-use App\Http\Controllers\Coach\CoachComController;
+use App\Http\Controllers\player\CoachComController;
 use App\Http\Controllers\player\PreCommunityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
