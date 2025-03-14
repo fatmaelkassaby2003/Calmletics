@@ -10,6 +10,13 @@ class ComPre extends Model
     use HasFactory;
     protected $table = 'compres';
 
+    protected $fillable = ['name', 'level', 'code', 'plan_id', 'user_id'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function users()
     {
         return $this->hasMany(User::class, 'com_pre_id', 'id'); 

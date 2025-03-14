@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Compre;
+use Illuminate\Support\Facades\Auth;
 
 
 class ProfileController extends Controller
@@ -111,4 +113,18 @@ public function updatepassword(Request $request)
 
     return response()->json(['message' => 'Password changed successfully'], 200);
 }
+
+
+public function getUserCompres()
+    {
+        if (Auth::user()->role != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        $compres = Compre::where('user_id', Auth::id())->pluck('name');
+
+        return response()->json([
+            'message' => 'Retrieved all compres created by the user',
+            'Communities' => $compres
+        ]);
+    }
 }

@@ -12,6 +12,8 @@ use App\Http\Controllers\player\HomeController;
 use App\Http\Controllers\player\PreCommunityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Coach\CoachComController;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,3 +82,12 @@ Route::middleware(['jwt.auth'])->post('/updatepassword', [ProfileController::cla
 
 Route::middleware(['jwt.auth'])->post('/store-score', [PlandatesController::class, 'storeScore']);
 Route::middleware(['jwt.auth'])->get('/get-scores-last-7-days', [PlandatesController::class, 'getScoresForLast7Days']);
+
+
+//////////////////////////////////////////////////////    COACH    ////////////////////////////////////////////////////////////////
+Route::middleware(['jwt.auth'])->prefix('coach')->group(function () {
+Route::post('/compre/create', [CoachComController::class, 'createCompre']);
+Route::get('/compre/my-compres', [ProfileController::class, 'getUserCompres']);
+Route::post('/card/store', [CoachComController::class, 'storeCard']);
+
+});
