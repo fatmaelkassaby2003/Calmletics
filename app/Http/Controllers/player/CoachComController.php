@@ -12,6 +12,7 @@ class CoachComController extends Controller
 {
     public function createCompre(Request $request)
     {
+        dd($request);
         if (Auth::user()->role != 1) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
