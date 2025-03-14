@@ -4,7 +4,7 @@ namespace App\Http\Controllers\player;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Compre;
+use App\Models\ComPre;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Card;
 
@@ -24,9 +24,9 @@ class CoachComController extends Controller
 
         do {
             $code = rand(1000, 9999);
-        } while (Compre::where('code', $code)->exists());
+        } while (ComPre::where('code', $code)->exists());
 
-        $compre = Compre::create([
+        $compre = ComPre::create([
             'name' => $request->name,
             'level' => $request->level,
             'plan_id' => $request->plan_id,
