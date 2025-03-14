@@ -89,5 +89,4 @@ Route::middleware(['jwt.auth'])->prefix('coach')->group(function () {
 Route::post('/compre/create', [CoachComController::class, 'createCompre']);
 Route::get('/compre/my-compres', [ProfileController::class, 'getUserCompres']);
 Route::post('/card/store', [CoachComController::class, 'storeCard']);
-
 });
