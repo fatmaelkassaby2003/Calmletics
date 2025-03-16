@@ -16,13 +16,7 @@ class AnswerController extends Controller
 
     if (!$user) {
         return response()->json(['error' => 'Unauthorized. Token might be invalid or expired.'], 401);
-    }
-
-    $existingAnswer = Answer::where('user_id', $user->id)->first();
-    
-    if ($existingAnswer) {
-        return response()->json(['error' => 'You have already submitted an answer.'], 403);
-    }
+    }    
 
     $validator = Validator::make($request->all(), [
         'Age' => 'required|string',
@@ -46,7 +40,7 @@ class AnswerController extends Controller
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
-    $answer = Answer::updateOrCreate(
+    $answer = Answer::UpdateOrCreate(
         ['user_id' => $user->id], 
         [
             'Age' => $request->Age,
