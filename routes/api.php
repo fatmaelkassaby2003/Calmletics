@@ -58,7 +58,7 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
 
     Route::get('/join', [FreeCommunityController::class, 'join']);
     Route::get('/community', [FreeCommunityController::class, 'community']);
-    Route::post('/leaderboard', [FreeCommunityController::class, 'leaderboard']);
+    Route::get('/leaderboard', [FreeCommunityController::class, 'leaderboard']);
     Route::get('/plan', [FreeCommunityController::class, 'plan']);
 
     Route::post('/pre-join', [PreCommunityController::class, 'join']);
