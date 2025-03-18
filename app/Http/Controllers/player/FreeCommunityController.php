@@ -7,27 +7,36 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\ComFree;
 
 class FreeCommunityController extends Controller
 {
     public function join(Request $request)
-    {
-        $user = User::find(auth()->id());
-        // $validator = Validator::make($request->all(), [
-        //     'com_free_id' => 'required|integer|min:0',
-        // ]);
+{
+    $user = User::find(auth()->id());
 
-        // if ($validator->fails()) {
-        //     return response()->json(['errors' => $validator->errors()], 422);
-        // }
-        // $user->com_free_id = $request->com_free_id;
-        $user->com_free_id = 1;
-        $user->save();
-        return response()->json(
-            ['message' => 'Joined successfully']
-            , 200
-        );
+    if (!$user || $user->cluster === null) {
+        return response()->json(['error' => 'Cluster not assigned to user'], 400);
     }
+
+    $communityId = $user->cluster + 1;
+
+    $community = ComFree::where('id', $communityId)->first();
+
+    if (!$community) {
+        return response()->json(['error' => 'No matching community found'], 404);
+    }
+
+    $user->com_free_id = $community->id;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Joined successfully',
+        'community_name:' => $community->name
+    ], 200);
+}
+
+
 
 
     public function community(Request $request)
