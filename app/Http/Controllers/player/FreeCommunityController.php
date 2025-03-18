@@ -32,7 +32,7 @@ class FreeCommunityController extends Controller
 
     return response()->json([
         'message' => 'Joined successfully',
-        'community_name:' => $community->name
+        'community_name' => $community->name
     ], 200);
 }
 
