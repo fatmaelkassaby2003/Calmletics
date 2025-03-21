@@ -45,7 +45,7 @@ class CoachController extends Controller
 
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
+                return response()->json(['error' => 'Email or password is wrong'], 401);
             }
             $user = JWTAuth::user();
         
