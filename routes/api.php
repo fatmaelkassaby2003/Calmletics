@@ -4,6 +4,8 @@ use App\Http\Controllers\Answer\AnswerController;
 use App\Http\Controllers\auth\CoachController;
 use App\Http\Controllers\auth\ForgotPasswordController;
 use App\Http\Controllers\auth\PlayerController;
+use App\Http\Controllers\Chat\CommunityMessageController;
+use App\Http\Controllers\Chat\WebSocketController;
 use App\Http\Controllers\plans\DoneplaneController;
 use App\Http\Controllers\player\ProfileController;
 use App\Http\Controllers\plans\PlandatesController;
@@ -72,6 +74,10 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
     Route::post('/done', [DoneplaneController::class, 'updateProgress']); // تحديث التقدم
     Route::get('/get-content', [DoneplaneController::class, 'getNextContent']);
 
+
+
+    Route::post('/community/message/send', [WebSocketController::class, 'sendMessage']);
+    Route::get('/community/messages', [WebSocketController::class, 'index']);
 
 });
 

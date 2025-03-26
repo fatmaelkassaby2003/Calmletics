@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('community.{id}', function ($user, $id) {
+    return $user->com_pre_id == $id || $user->com_free_id == $id;
+});
