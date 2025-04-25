@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Plan extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['name', 'content1', 'content2', 'content3', 'content4',
+    'content5', 'content6', 'content7', 'content8',
+    'content9', 'content10', 'content11', 'content12',
+    'content13', 'content14', 'content15', 'content16',];
+
+    public function comfree()
+    {
+        return $this->hasOne(ComFree::class ); 
+    }
+
+    public function compre()
+    {
+        return $this->hasOne(compre::class  ); 
+    }
+}

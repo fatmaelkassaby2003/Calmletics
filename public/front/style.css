@@ -1,0 +1,309 @@
+*{
+    margin: 0;
+    padding: 0;
+    color: white;
+    font-family: 'Cairo',sans-serif;
+}
+
+body{
+    background-color: #001;
+    display: flex;
+
+}
+
+.img-box
+{
+    width: 50px;
+    height: 50px;
+    /* display: flex; */
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #fff;
+    flex-shrink: 0;
+}
+
+.img-box img
+{
+    width: 100%;
+}
+
+.profile
+{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.profile h2
+{
+    font-size: 20px;
+}
+
+.menu
+{
+    background-color: #123;
+    width: 60px;
+    min-height: 100vh;
+    padding: 20px;
+    overflow: hidden;
+    transition: .5s;
+}
+
+.menu:hover
+{
+    width: 260px;
+}
+
+ul
+{
+    list-style: none;
+    position: relative;
+    height: 95%;
+}
+
+ul li a 
+{
+    display: block;
+    text-decoration: none;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    transition: .5s;
+}
+
+ul li a:hover,.active,.data-info .box:hover,td:hover
+{
+    background-color: #ffffff55;
+}
+
+.log-out
+{
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.log-out a
+{
+    background-color: #a00;
+}
+
+ul li a i
+{
+    font-size: 30px;
+}
+
+.content
+{
+    width: 100%;
+    margin: 10px;
+}
+
+.title-info
+{
+    display: flex;
+    align-items: center;
+    background-color: #0080ff;
+    padding: 10px;
+    justify-content: space-between;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.data-info
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.data-info .box
+{
+    background-color: #123;
+    height: 150px;
+    flex-basis: 150px;
+    flex-grow: 1;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.data-info .box i
+{
+    font-size: 40px;
+}
+
+.data-info .box .data
+{
+    text-align: center;
+
+}
+
+.data-info .box .data span
+{
+    font-size: 20px;
+}
+
+table
+{
+    width: 100%;
+    text-align: center;
+    /* border-collapse: collapse; */
+    border-spacing: 8px;
+}
+
+td ,th
+{
+    background-color: #123;
+    height: 40px;
+    border-radius: 8px;
+}
+
+th
+{
+    background-color: #0080ff;
+}
+
+.com,.code,.role
+{
+padding: 6px;
+border-radius: 6px;
+}
+
+.com
+{
+    background-color: green;
+    display: inline-block;
+    width: 180px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px; 
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.code
+{
+    background-color: gold;
+    color: #000;
+    display: inline-block;
+    width: 80px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px; 
+    border-radius: 8px;
+    font-weight: 900px;
+}
+
+.role
+{
+    background-color: #ff0015;
+    color: #fff;
+    display: inline-block;
+    width: 80px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px; 
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.community-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 600px;
+    margin: 80px auto;
+    padding: 20px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-box label {
+    font-weight: bold;
+    color: #333;
+}
+
+.input-box input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+}
+.submit-link {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #3490dc;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+    transition: background 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.submit-link i {
+    margin-right: 8px;
+}
+
+.submit-link:hover {
+    background-color: #2779bd;
+}
+
+
+.success-message {
+    background-color: #4CAF50; /* أخضر للإشارة إلى النجاح */
+    color: white;
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    position: relative;
+    font-size: 1.2em;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.success-message .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.success-message .close-btn:hover {
+    color: #ddd;
+}
+
+.error-message {
+    background-color: rgb(230, 2, 2); /* أخضر للإشارة إلى النجاح */
+    color: white;
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    position: relative;
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
