@@ -11,22 +11,34 @@ class AddplanController extends Controller
 {
     // middleware لحماية الدالة
     public function storePlan(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'level' => 'required|string|max:100',
-        ]);
-    
-        $plan = Plan::create([
-            'name' => $request->name,
-            'level' => $request->level,
-        ]);
-    
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'level' => 'required|string|max:100',
+    ]);
+
+    // تحقق من التكرار
+    $exists = Plan::where('name', $request->name)
+                  ->where('level', $request->level)
+                  ->exists();
+
+    if ($exists) {
         return response()->json([
-            'message' => 'تم إنشاء البلان بنجاح',
-            'plan' => $plan
-        ]);
+            'message' => 'هذا البلان موجود بالفعل بنفس المستوى',
+        ], 422); // رمز 422 يعني "طلب غير صالح"
     }
+
+    $plan = Plan::create([
+        'name' => $request->name,
+        'level' => $request->level,
+    ]);
+
+    return response()->json([
+        'message' => 'تم إنشاء البلان بنجاح',
+        'plan' => $plan
+    ]);
+}
+
     
     public function storeSession(Request $request)
 {
