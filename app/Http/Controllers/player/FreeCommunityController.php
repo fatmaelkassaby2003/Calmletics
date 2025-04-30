@@ -14,7 +14,6 @@ class FreeCommunityController extends Controller
     public function join(Request $request)
 {
     $user = User::find(auth()->id());
-
     if (!$user || $user->cluster === null) {
         return response()->json(['error' => 'Cluster not assigned to user'], 400);
     }
