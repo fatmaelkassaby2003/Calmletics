@@ -9,7 +9,6 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class AddplanController extends Controller
 {
-    // middleware لحماية الدالة
     public function storePlan(Request $request)
 {
     $request->validate([
@@ -67,6 +66,5 @@ class AddplanController extends Controller
     ]);
 }
 
-    
 }
 
