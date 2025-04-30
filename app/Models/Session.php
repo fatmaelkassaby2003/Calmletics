@@ -9,6 +9,10 @@ class Session extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['name', 'plan_id','content',];
+
+
+
     public function users()
     {
         return $this->belongsToMany(User::class);

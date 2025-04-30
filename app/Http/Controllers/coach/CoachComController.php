@@ -8,6 +8,7 @@ use App\Models\ComPre;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Card;
 use App\Models\Plan;
+use App\Models\Session;
 
 class CoachComController extends Controller
 {
@@ -22,51 +23,40 @@ class CoachComController extends Controller
             'level' => 'required|string|max:50',
         ]);
     
-        $plans = Plan::where('level', $request->level)->get();
+        $plans = Plan::with('sessions')->where('level', $request->level)->get();
     
         $plansWithContentStats = $plans->map(function ($plan) {
-            $videoCount = 0;
-            $audioCount = 0;
-            $pdfCount = 0;
-            $nonNullCount = 0;
-            $videoImage = asset('front/images/vidio-icon.png'); 
+            $videoImage = asset('front/images/vidio-icon.png');
             $audioImage = asset('front/images/audio-icon.png');
             $pdfImage = asset('front/images/subtitle.png');
     
-            for ($i = 1; $i <= 24; $i++) {
-                $field = 'content' . $i;
-                $value = $plan->$field;
+            $videoCount = 0;
+            $audioCount = 0;
+            $pdfCount = 0;
     
-                if (!is_null($value)) {
-                    $nonNullCount++;
+            foreach ($plan->sessions as $session) {
+                $lower = strtolower($session->content);
     
-                    $lower = strtolower($value);
-    
-                    if (preg_match('/\.(mp4|mov|avi|mkv)|youtube\.com|vimeo\.com/', $lower)) {
-                        $videoCount++;
-                        $videoImage = asset('front/images/vidio-icon.png');
-                    } elseif (preg_match('/\.(mp3|wav|ogg)/', $lower)) {
-                        $audioCount++;
-                        $audioImage = asset('front/images/audio-icon.png'); 
-                    } elseif (preg_match('/\.pdf/', $lower)) {
-                        $pdfCount++;
-                        $pdfImage = asset('front/images/subtitle.png');
-                    }
+                if (preg_match('/\.(mp4|mov|avi|mkv)|youtube\.com|vimeo\.com/', $lower)) {
+                    $videoCount++;
+                } elseif (preg_match('/\.(mp3|wav|ogg)/', $lower)) {
+                    $audioCount++;
+                } elseif (preg_match('/\.pdf/', $lower)) {
+                    $pdfCount++;
                 }
             }
-                $videoPercentage = $nonNullCount ? round(($videoCount / $nonNullCount) * 100) : 0;
-            $audioPercentage = $nonNullCount ? round(($audioCount / $nonNullCount) * 100) : 0;
-            $pdfPercentage = $nonNullCount ? round(($pdfCount / $nonNullCount) * 100) : 0;
+    
+            $total = $videoCount + $audioCount + $pdfCount;
     
             return [
-                'name' => $plan->name,
-                'video_image' => $videoImage, 
+                'plan_name' => $plan->name,
+                'sessions_count' => $plan->sessions->count(),
+                'video_image' => $videoImage,
                 'audio_image' => $audioImage,
-                'pdf_image' => $pdfImage, 
-                'Sessions' => $nonNullCount,
-                'video_percentage' => $videoPercentage, 
-                'audio_percentage' => $audioPercentage,  
-                'pdf_percentage' => $pdfPercentage, 
+                'pdf_image' => $pdfImage,
+                'video_percentage' => $total ? round(($videoCount / $total) * 100) : 0,
+                'audio_percentage' => $total ? round(($audioCount / $total) * 100) : 0,
+                'pdf_percentage' => $total ? round(($pdfCount / $total) * 100) : 0,
             ];
         });
     
@@ -75,7 +65,6 @@ class CoachComController extends Controller
         ]);
     }
     
-
     public function createCompre(Request $request)
     {
         if (Auth::user()->role != 1) {
@@ -105,6 +94,51 @@ class CoachComController extends Controller
             'data' => $compre
         ], 201);
     }
+
+
+    public function getSessionsByPlanId(Request $request)
+    {
+        if (!Auth::check() || Auth::user()->role != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+    
+        $request->validate([
+            'plan_id' => 'required|exists:plans,id',
+        ]);
+    
+        $sessions = Session::where('plan_id', $request->plan_id)->get();
+        $sessionsCount = $sessions->count();
+    
+        $sessionsData = $sessions->values()->map(function ($session, $index) {
+            $lower = strtolower($session->content);
+            $type = 'unknown';
+            $icon = '';
+    
+            if (preg_match('/\.(mp4|mov|avi|mkv)|youtube\.com|vimeo\.com/', $lower)) {
+                $type = 'video';
+                $icon = asset('front/images/vidio-icon.png');
+            } elseif (preg_match('/\.(mp3|wav|ogg)/', $lower)) {
+                $type = 'audio';
+                $icon = asset('front/images/audio-icon.png');
+            } elseif (preg_match('/\.pdf/', $lower)) {
+                $type = 'pdf';
+                $icon = asset('front/images/subtitle.png');
+            }
+    
+            return [
+                'session_number' => 'Session ' . ($index + 1),
+                'session_name' => $session->name,
+                'type' => $type,
+                'icon' => $icon,
+            ];
+        });
+    
+        return response()->json([
+            'sessions_count' => $sessionsCount,
+            'sessions' => $sessionsData,
+        ]);
+    }
+    
 
     public function storeCard(Request $request)
     {

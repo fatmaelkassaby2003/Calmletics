@@ -101,6 +101,7 @@ Route::post('/compre/create', [CoachComController::class, 'createCompre']);
 Route::post('/plans', [CoachComController::class, 'getPlansByLevel']);
 Route::get('/compre/my-compres', [ProfileController::class, 'getUserCompres']);
 Route::post('/card/store', [CoachComController::class, 'storeCard']);
+Route::post('/sessions', [CoachComController::class, 'getSessionsByPlanId']);
 });
 
 
@@ -110,7 +111,8 @@ Route::middleware(['jwt.auth'])->prefix('file')->group(function () {
     });
 
 
-Route::post('/plans/upload', [AddplanController::class, 'uploadToPlan'])->middleware('jwt.auth');
+Route::post('/plans/upload', [AddplanController::class, 'storePlan']);
+Route::post('/sessions/upload', [AddplanController::class, 'storeSession']);
 
 Route::post('/upload', [FileController::class, 'upload']);
 
