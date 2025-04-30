@@ -11,7 +11,7 @@ use App\Http\Controllers\player\ProfileController;
 use App\Http\Controllers\plans\PlandatesController;
 use App\Http\Controllers\player\FreeCommunityController;
 use App\Http\Controllers\player\HomeController;
-use App\Http\Controllers\player\CoachComController;
+use App\Http\Controllers\coach\CoachComController;
 use App\Http\Controllers\player\PreCommunityController;
 use App\Http\Controllers\AddplanController;
 use App\Http\Controllers\FileController;
@@ -98,6 +98,7 @@ Route::middleware(['jwt.auth'])->get('/get-scores-last-7-days', [PlandatesContro
 //////////////////////////////////////////////////////    COACH    ////////////////////////////////////////////////////////////////
 Route::middleware(['jwt.auth'])->prefix('coach')->group(function () {
 Route::post('/compre/create', [CoachComController::class, 'createCompre']);
+Route::post('/plans', [CoachComController::class, 'getPlansByLevel']);
 Route::get('/compre/my-compres', [ProfileController::class, 'getUserCompres']);
 Route::post('/card/store', [CoachComController::class, 'storeCard']);
 });

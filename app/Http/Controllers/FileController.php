@@ -67,14 +67,12 @@ class FileController extends Controller
 
     public function getRec3()
     {
-        // التأكد من تسجيل الدخول
         if (!auth()->check()) {
             return response()->json([
                 'message' => 'يجب تسجيل الدخول أولاً',
             ], 401);
         }
     
-        // الحصول على أول rec3 موجود في جدول الملفات
         $file = File::whereNotNull('rec3')->latest()->first();
     
         if (!$file) {
@@ -91,19 +89,15 @@ class FileController extends Controller
 
     public function getRecording(Request $request)
 {
-    // التأكد من تسجيل الدخول
     if (!auth()->check()) {
         return response()->json([
             'message' => 'يجب تسجيل الدخول أولاً',
         ], 401);
     }
-
-    // تحقق من وجود القيمة في body وتحقق من أنها 1 أو 2
     $request->validate([
         'file' => 'required|in:1,2'
     ]);
 
-    // جلب أول ملف يحتوي على rec1 أو rec2
     $file = File::whereNotNull('rec1')->whereNotNull('rec2')->latest()->first();
 
     if (!$file) {
@@ -112,7 +106,6 @@ class FileController extends Controller
         ], 404);
     }
 
-    // التحقق من قيمة file وإرجاع rec1 أو rec2
     if ($request->input('file') == 1) {
         return response()->json([
             'rec1' => $file->rec1,

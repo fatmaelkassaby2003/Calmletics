@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('doneplans', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('plan_id');
-            $table->integer('content_number');
+            $table->unsignedBigInteger('session_id');
             $table->unsignedBigInteger('user_id');
             $table->boolean('done');
+            $table->foreign('session_id')->references('id')->on('sessions')->onDelete('cascade');
             $table->foreign('plan_id')->references('id')->on('plans')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
