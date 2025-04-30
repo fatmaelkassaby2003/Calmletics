@@ -25,7 +25,7 @@ class AddplanController extends Controller
     if ($exists) {
         return response()->json([
             'message' => 'هذا البلان موجود بالفعل بنفس المستوى',
-        ], 422); // رمز 422 يعني "طلب غير صالح"
+        ], 422); 
     }
 
     $plan = Plan::create([
