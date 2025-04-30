@@ -36,6 +36,7 @@ class CoachController extends Controller
         return response()->json([
             'message' => 'coach successfully registered',
             'token' => $token,
+            'user' => $user
         ], 201);
     }
 
@@ -58,6 +59,7 @@ class CoachController extends Controller
         return response()->json([
             'message' => ' successfully ',
             'token' => $token,
+            'user' => auth()->user(),
         ], 200);
         
     }

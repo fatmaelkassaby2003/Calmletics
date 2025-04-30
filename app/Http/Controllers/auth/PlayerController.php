@@ -36,6 +36,7 @@ class PlayerController extends Controller
         return response()->json([
             'message' => 'player successfully registered',
             'token' => $token,
+            'user' => $user
         ], 201);
     }
     
@@ -54,6 +55,7 @@ class PlayerController extends Controller
         return response()->json([
             'message' => ' successfully ',
             'token' => $token,
+            'user' => auth()->user(),
         ], 200);
     }
     
