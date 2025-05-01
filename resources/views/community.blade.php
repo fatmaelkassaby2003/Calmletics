@@ -70,7 +70,7 @@
         </div>
         
 
-        <form action="https://calmletics-production.up.railway.app/community" method="POST" class="community-form">
+        <form action="{{ route('communities.store') }}" method="POST" class="community-form">
         @csrf
 
         @if (session('success'))
