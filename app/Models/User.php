@@ -27,6 +27,10 @@ class User extends Authenticatable implements JWTSubject
         'score',
         'flag',
         'image',
+        'com_free_id',
+        'com_pre_id',
+        'plan_id',
+        'percentage'
     ];
 
     /**

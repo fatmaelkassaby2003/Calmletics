@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Plandate;
-
-
+use App\Models\User;
 
 class DoneplaneController extends Controller
 {
@@ -64,7 +63,7 @@ class DoneplaneController extends Controller
       
     public function getsessions(Request $request)
     {
-        $user = auth()->user();
+        $user = User::find(auth()->id());
         if ($user->com_free_id ) {
             $plan_id = $user->comFree->plan_id;
         } else if ($user->com_pre_id) {
@@ -87,11 +86,11 @@ class DoneplaneController extends Controller
         ->where('plan_id', $plan_id)
         ->where('id', $nextContentNumber)
         ->first();
-        $content_type = '/front/images/subtitle.png'; 
+        $content_type = asset('front/images/subtitle.png'); 
         if (Str::endsWith($content->content, '.mp3')) {
-            $content_type = '/front/images/audio-icon.png';
+            $content_type = asset('/front/images/audio-icon.png');
         } elseif (Str::endsWith($content->content, '.mp4')) {
-            $content_type = '/front/images/vidio-icon.png';
+            $content_type = asset('/front/images/vidio-icon.png');
         }
         $contents = DB::table('sessions')
         ->where('plan_id', $plan_id)
@@ -106,11 +105,11 @@ class DoneplaneController extends Controller
             $order = $index + 1;
 
             if ($order < $nextContentNumber) {  
-                $status = 'done';
+                $status = asset('front/images/done-icon.png');
             } elseif ($order == $nextContentNumber) {
-                $status = 'active';
+                $status = $content_type;
         } else {
-            $status = 'non-active';
+            $status = asset('front/images/lock-icon.png');
         }
 
         $numberedList[] = [
@@ -127,11 +126,11 @@ class DoneplaneController extends Controller
     ->count();
     $count = $contents->count();
     $Percentage = ($completedSessionsCount / $count) * 100;
-    
+    $user->Percentage = $Percentage;
+    $user->save();
     return response()->json([
         'count' => $count,
         'Percentage' => $Percentage . ' %',
-        'content_type' => $content_type,
         'session_list' => $numberedList
         ]);
     }
