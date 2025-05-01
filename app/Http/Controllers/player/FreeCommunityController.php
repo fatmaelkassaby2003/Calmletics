@@ -14,19 +14,24 @@ class FreeCommunityController extends Controller
     public function join(Request $request)
 {
     $user = User::find(auth()->id());
+
     if (!$user || $user->cluster === null) {
         return response()->json(['error' => 'Cluster not assigned to user'], 400);
     }
 
     $communityId = $user->cluster + 1;
-
-    $community = ComFree::where('id', $communityId)->first();
+    $community = ComFree::find($communityId);
 
     if (!$community) {
         return response()->json(['error' => 'No matching community found'], 404);
     }
 
     $user->com_free_id = $community->id;
+
+    if ($user->com_pre_id !== null) {
+        $user->com_pre_id = null;
+    }
+
     $user->save();
 
     return response()->json([
@@ -34,8 +39,6 @@ class FreeCommunityController extends Controller
         'community_name' => $community->name
     ], 200);
 }
-
-
 
 
     public function community(Request $request)

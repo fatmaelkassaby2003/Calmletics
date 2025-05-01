@@ -15,21 +15,36 @@ class PreCommunityController extends Controller
     public function join(Request $request)
     {
         $user = User::find(auth()->id());
-        $compre = ComPre::where('code', $request->code)->first();
-
+    
         $validator = Validator::make($request->all(), [
             'code' => 'required|integer|digits:4',
         ]);
+    
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+    
+        $compre = ComPre::where('code', $request->code)->first();
+    
         if (!$compre) {
             return response()->json(['error' => 'Community not found'], 400);
         }
+    
         $user->com_pre_id = $compre->id;
+    
+        if ($user->com_free_id !== null) {
+            $user->com_free_id = null;
+        }
+    
         $user->save();
-        return response()->json($user);
+    
+        return response()->json([
+            'message' => 'Joined successfully',
+            'community_name' => $compre->name,
+            'user' => $user
+        ]);
     }
+    
     public function availableDates()
     {
         $dates = [];
