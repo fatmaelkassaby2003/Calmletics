@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,11 +12,6 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -33,32 +27,49 @@ class User extends Authenticatable implements JWTSubject
         'percentage'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    public function getJWTIdentifier()
+
+    /**
+     * Automatically update plan_id based on com_pre_id or com_free_id.
+     */
+    protected static function booted()
     {
-        return $this->getKey();
+        static::saving(function ($user) {
+            if ($user->com_pre_id) {
+                $comPre = \App\Models\ComPre::find($user->com_pre_id);
+                if ($comPre) {
+                    $user->plan_id = $comPre->plan_id;
+                }
+            } elseif ($user->com_free_id) {
+                $comFree = \App\Models\ComFree::find($user->com_free_id);
+                if ($comFree) {
+                    $user->plan_id = $comFree->plan_id;
+                }
+            }
+        });
+    }
+
+    // Relationships
+    public function comPre()
+    {
+        return $this->belongsTo(ComPre::class, 'com_pre_id', 'id');
     }
 
     public function comFree()
     {
-        return $this->belongsTo(ComFree::class);
+        return $this->belongsTo(ComFree::class, 'com_free_id', 'id');
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class, 'plan_id', 'id');
     }
 
     public function planDates()
@@ -66,13 +77,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(planDate::class);
     }
 
-    public function answers() {
-        return $this->hasOne(Answer::class);
-    } 
-
-    public function comPre()
+    public function answers()
     {
-        return $this->belongsTo(ComPre::class, 'com_pre_id', 'id');
+        return $this->hasOne(Answer::class);
     }
 
     public function sessions()
@@ -80,13 +87,14 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Session::class)->withPivot('created_at');
     }
 
+    // JWT
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
     public function getJWTCustomClaims()
     {
         return [];
     }
-    public function plan()
-    {
-        return $this->belongsTo(plan::class, 'plan_id', 'id');
-    }
-
 }

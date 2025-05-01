@@ -116,15 +116,18 @@ public function updatepassword(Request $request)
 
 
 public function getUserCompres()
-    {
-        if (Auth::user()->role != 1) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-        $compres = ComPre::where('user_id', Auth::id())->pluck('name');
-
-        return response()->json([
-            'message' => 'Retrieved all compres created by the user',
-            'Communities' => $compres
-        ]);
+{
+    if (Auth::user()->role != 1) {
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
+
+    $compres = ComPre::where('user_id', Auth::id())
+                ->get(['name', 'level']); // نجيب الأعمدة المطلوبة
+
+    return response()->json([
+        'message' => 'Retrieved all compres created by the user',
+        'Communities' => $compres
+    ]);
+}
+
 }
