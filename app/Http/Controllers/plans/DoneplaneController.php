@@ -87,11 +87,11 @@ class DoneplaneController extends Controller
         ->where('plan_id', $plan_id)
         ->where('id', $nextContentNumber)
         ->first();
-        $content_type = 'article'; 
+        $content_type = '/front/images/subtitle.png'; 
         if (Str::endsWith($content->content, '.mp3')) {
-            $content_type = 'audio';
+            $content_type = '/front/images/audio-icon.png';
         } elseif (Str::endsWith($content->content, '.mp4')) {
-            $content_type = 'video';
+            $content_type = '/front/images/vidio-icon.png';
         }
         $contents = DB::table('sessions')
         ->where('plan_id', $plan_id)
