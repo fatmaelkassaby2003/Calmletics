@@ -86,6 +86,11 @@ class DoneplaneController extends Controller
         ->where('plan_id', $plan_id)
         ->where('id', $nextContentNumber)
         ->first();
+        if(!$content){
+            return response()->json([
+                'message' => 'This plan has already been completed.'
+            ]);
+        }
         $content_type = asset('front/images/subtitle.png'); 
         if (Str::endsWith($content->content, '.mp3')) {
             $content_type = asset('/front/images/audio-icon.png');
