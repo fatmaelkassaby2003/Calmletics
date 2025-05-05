@@ -69,6 +69,8 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
     Route::get('/join', [FreeCommunityController::class, 'join']);
     Route::get('/community', [FreeCommunityController::class, 'community']);
     Route::get('/leaderboard', [FreeCommunityController::class, 'leaderboard']);
+    Route::get('/com_pre/leaderboard', [PreCommunityController::class, 'leaderboard']);
+
     Route::get('/plan', [FreeCommunityController::class, 'plan']);
 
     Route::post('/pre-join', [PreCommunityController::class, 'join']);
@@ -112,6 +114,8 @@ Route::get('/community-members-status', [CommunityDetailsController::class, 'get
 Route::get('/delete-community', [EditcomController::class, 'deleteCommunity']);
 Route::post('/update-community-name', [EditcomController::class, 'updateCommunityName']);
 Route::post('/remove-player-from-community', [EditcomController::class, 'removePlayerFromCommunity']);
+Route::get('/leaderboard', [CoachComController::class, 'leaderboard']);
+
 });
 
 

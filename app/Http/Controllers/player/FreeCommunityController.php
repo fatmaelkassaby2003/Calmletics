@@ -53,45 +53,48 @@ class FreeCommunityController extends Controller
     {
         $user = User::find(auth()->id());
         $time = $request->time;
-        $topUsersByDay = DB::table('plandates')
-        ->join('users', 'plandates.user_id', '=', 'users.id')
-        ->select('users.name', 'users.image', 'users.flag', 'plandates.user_id', DB::raw('SUM(plandates.score) as total_score'))
-        ->whereDate('plandates.date', now()->toDateString())
-        ->groupBy('plandates.user_id', 'users.name', 'users.image', 'users.flag')
-        ->orderByDesc('total_score')
-        ->get();
-    
-    $topUsersByWeek = DB::table('plandates')
-        ->join('users', 'plandates.user_id', '=', 'users.id')
-        ->select('users.name', 'users.image', 'users.flag', 'plandates.user_id', DB::raw('SUM(plandates.score) as total_score'))
-        ->whereBetween('plandates.date', [now()->startOfWeek(), now()->endOfWeek()])
-        ->groupBy('plandates.user_id', 'users.name', 'users.image', 'users.flag')
-        ->orderByDesc('total_score')
-        ->get();
-    
-    $topUsersAllTime = DB::table('plandates')
-        ->join('users', 'plandates.user_id', '=', 'users.id')
-        ->select('users.name', 'users.image', 'users.flag', 'plandates.user_id', DB::raw('SUM(plandates.score) as total_score'))
-        ->groupBy('plandates.user_id', 'users.name', 'users.image', 'users.flag')
-        ->orderByDesc('total_score')
-        ->get();
-    
-    
+        if(!$user->com_free_id){
+            return response()->json(['error' => 'User is not part of free community'], 403);
+            
+        }
+        $topUsersByDay = DB::table('users')
+            ->leftJoin('plandates', function ($join) {
+                $join->on('users.id', '=', 'plandates.user_id')
+                ->whereDate('plandates.date', now()->toDateString());})
+            ->select('users.name','users.image','users.flag','users.com_free_id','users.id as user_id',
+            DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
+            ->where('users.com_free_id', $user->com_free_id)
+            ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_free_id')
+            ->orderByDesc('total_score')
+            ->get();
+        
+        $topUsersByWeek = DB::table('users')
+            ->leftJoin('plandates', function ($join) {
+                $join->on('users.id', '=', 'plandates.user_id')
+                ->whereBetween('plandates.date', [now()->startOfWeek(), now()->endOfWeek()]);})
+            ->select('users.name','users.image','users.flag','users.com_free_id','users.id as user_id',
+            DB::raw('COALESCE(SUM(plandates.score), 0) as total_score')
+            )
+            ->where('users.com_free_id', $user->com_free_id)
+            ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_free_id')
+            ->orderByDesc('total_score')
+            ->get();
+        
+        $topUsersAllTime = DB::table('users')
+            ->leftJoin('plandates', 'users.id', '=', 'plandates.user_id')
+            ->select('users.name','users.image','users.flag','users.com_free_id','users.id as user_id',
+            DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
+            ->where('users.com_free_id', $user->com_free_id)
+            ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_free_id')
+            ->orderByDesc('total_score')
+            ->get();     
         if ($time === 'daily') {
-            return response()->json([$topUsersByDay,'user_id'=>$user->id]);
+            return response()->json(['user_id' => $user->id,'users' => $topUsersByDay]);
         } elseif ($time === 'weekly') {
-            return response()->json([$topUsersByWeek,'user_id'=>$user->id]);
+            return response()->json(['user_id' => $user->id,'users' => $topUsersByWeek]);
         } else {
-            return response()->json([$topUsersAllTime,'user_id'=>$user->id]);
+            return response()->json(['user_id' => $user->id,'users' => $topUsersAllTime]);
         }
     }
-    public function plan (){
-        $user = User::find(auth()->id());
-        if ($user->com_free_id == null) {
-            $plan = $user->compre->plan;
-            return response()->json($plan);
-        }
-        $plan = $user->comFree->plan;
-        return response()->json($plan);
-    }
+
 }
