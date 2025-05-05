@@ -20,7 +20,7 @@ class HomeCommunityController extends Controller
         return response()->json(['error' => 'Unauthorized'], 403);
     }
 
-    $level = $request->query('level'); // القيمة ممكن تكون all, low, moderate, high أو null
+    $level = $request->query('level'); 
 
     $communitiesQuery = Compre::withCount('users')
         ->where('user_id', $coach->id);
@@ -59,13 +59,10 @@ public function getCoachPlayersStatus(Request $request)
     
     $playersQuery = User::whereIn('com_pre_id', $communityIds);
 
-    // استلام الفلتر من الـ request (all, missed, achievements)
     $statusFilter = $request->query('status'); 
 
-    // تعريف المتغير $now قبل استخدامه
     $now = \Carbon\Carbon::now();
 
-    // فلترة اللاعبين بناءً على الحالة
     if ($statusFilter) {
         $playersQuery = $playersQuery->get()->filter(function ($player) use ($now, $statusFilter) {
             $lastDone = Doneplan::where('user_id', $player->id)
@@ -79,23 +76,20 @@ public function getCoachPlayersStatus(Request $request)
                 $daysSinceDone = null;
             }
 
-            // تطبيق الفلتر حسب الحالة المطلوبة
             if ($statusFilter === 'achievements' && $daysSinceDone <= 2) {
-                return true; // يعرض اللاعبين الاكتيفين
+                return true; 
             }
 
             if ($statusFilter === 'missed' && ($daysSinceDone > 2 || is_null($daysSinceDone))) {
-                return true; // يعرض اللاعبين غير الاكتيفين
+                return true; 
             }
 
             return false;
         });
     } else {
-        // لو لم يتم تحديد الفلتر، نرجع كل اللاعبين
         $playersQuery = $playersQuery->get();
     }
 
-    // تجهيز البيانات
     $data = $playersQuery->map(function ($player) use ($now) {
         $communityName = optional($player->compre)->name ?? 'غير معروف';
         $lastDone = Doneplan::where('user_id', $player->id)
