@@ -14,57 +14,49 @@ use Illuminate\Support\Facades\Auth;
 class CommunityDetailsController extends Controller
 {
     public function getCommunityDetails(Request $request)
-{
-    $coach = Auth::user();
-
-    if (!$coach || $coach->role != 1) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
-
-    $communityId = $request->input('community_id');
-
-    if (!$communityId) {
-        return response()->json(['error' => 'Community ID is required'], 400);
-    }
-
-    $community = ComPre::where('id', $communityId)
-                        ->where('user_id', $coach->id)
-                        ->first();
-
-    if (!$community) {
-        return response()->json(['error' => 'Community not found or unauthorized'], 404);
-    }
-
-    // عدد اللاعبين في الكوميونتي
-    $playersCount = User::where('com_pre_id', $community->id)->count();
-
-    $plan = $community->plan;
-
-    if (!$plan) {
+    {
+        $coach = Auth::user();
+    
+        if (!$coach || $coach->role != 1) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+    
+        $communityId = $request->input('community_id');
+    
+        if (!$communityId) {
+            return response()->json(['error' => 'Community ID is required'], 400);
+        }
+    
+        $community = ComPre::where('id', $communityId)
+                            ->where('user_id', $coach->id)
+                            ->first();
+    
+        if (!$community) {
+            return response()->json(['error' => 'Community not found or unauthorized'], 404);
+        }
+    
+        // عدد اللاعبين وأسماؤهم
+        $players = User::where('com_pre_id', $community->id)->get(['id', 'name']);
+        $playersCount = $players->count();
+    
+        $plan = $community->plan;
+    
+        $sessions = $plan ? ($plan->sessions ?? []) : [];
+    
+        $sessionData = collect($sessions)->values()->map(function ($session, $index) {
+            return 'Session ' . ($index + 1) . ': ' . $session->name;
+        });
+    
         return response()->json([
+            'community_id' => $community->id,
             'community_name' => $community->name,
             'community_code' => $community->code,
             'players_count' => $playersCount,
-            'sessions' => []
+            'players' => $players,
+            'sessions' => $sessionData
         ]);
-    }
-
-    $sessions = $plan->sessions ?? [];
-
-    $sessionData = collect($sessions)->values()->map(function ($session, $index) {
-        return 'Session ' . ($index + 1) . ': ' . $session->name;
-    });
-
-    return response()->json([
-        'community_name' => $community->name,
-        'community_code' => $community->code,
-        'players_count' => $playersCount,
-        'sessions' => $sessionData
-    ]);
 }
-
-
-
+    
 public function getCommunityPlayersStatus(Request $request)
 {
     $coach = Auth::user();
