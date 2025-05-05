@@ -4,7 +4,7 @@ namespace App\Http\Controllers\coach;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Compre;
+use App\Models\ComPre;
 use App\Models\Doneplan;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
