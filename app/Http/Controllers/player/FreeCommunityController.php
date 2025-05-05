@@ -57,7 +57,6 @@ class FreeCommunityController extends Controller
         if (!$user->com_free_id) {
             return response()->json(['error' => 'User is not part of free community'], 403);
         }
-    
         $addRank = function ($collection) {
             $collection = $collection->values(); 
             foreach ($collection as $index => $item) {
@@ -65,17 +64,13 @@ class FreeCommunityController extends Controller
             }
             return $collection;
         };
-    
         $topUsersByDay = DB::table('users')
             ->leftJoin('plandates', function ($join) {
                 $join->on('users.id', '=', 'plandates.user_id')
                     ->whereDate('plandates.date', now()->toDateString());
             })
-            ->select(
-                'users.name', 'users.image', 'users.flag', 'users.com_free_id',
-                'users.id as user_id',
-                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score')
-            )
+            ->select('users.name', 'users.image', 'users.flag', 'users.com_free_id','users.id as user_id',
+                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
             ->where('users.com_free_id', $user->com_free_id)
             ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_free_id')
             ->orderByDesc('total_score')
@@ -88,11 +83,8 @@ class FreeCommunityController extends Controller
                 $join->on('users.id', '=', 'plandates.user_id')
                     ->whereBetween('plandates.date', [now()->startOfWeek(), now()->endOfWeek()]);
             })
-            ->select(
-                'users.name', 'users.image', 'users.flag', 'users.com_free_id',
-                'users.id as user_id',
-                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score')
-            )
+            ->select('users.name', 'users.image', 'users.flag', 'users.com_free_id','users.id as user_id',
+                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
             ->where('users.com_free_id', $user->com_free_id)
             ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_free_id')
             ->orderByDesc('total_score')
@@ -102,16 +94,12 @@ class FreeCommunityController extends Controller
     
         $topUsersAllTime = DB::table('users')
             ->leftJoin('plandates', 'users.id', '=', 'plandates.user_id')
-            ->select(
-                'users.name', 'users.image', 'users.flag', 'users.com_free_id',
-                'users.id as user_id',
-                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score')
-            )
+            ->select('users.name', 'users.image', 'users.flag', 'users.com_free_id','users.id as user_id',
+                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
             ->where('users.com_free_id', $user->com_free_id)
             ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_free_id')
             ->orderByDesc('total_score')
             ->get();
-    
         $topUsersAllTime = $addRank($topUsersAllTime);
     
         if ($time === 'daily') {

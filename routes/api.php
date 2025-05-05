@@ -111,7 +111,7 @@ Route::get('/players', [HomeCommunityController::class, 'getCoachPlayersStatus']
 Route::get('/players-count', [HomeCommunityController::class, 'getPremiumCommunityPlayersCount']);
 Route::get('/community-details', [CommunityDetailsController::class, 'getCommunityDetails']);
 Route::get('/community-members-status', [CommunityDetailsController::class, 'getCommunityPlayersStatus']);
-Route::get('/delete-community', [EditcomController::class, 'deleteCommunity']);
+Route::post('/delete-community', [EditcomController::class, 'deleteCommunity']);
 Route::post('/update-community-name', [EditcomController::class, 'updateCommunityName']);
 Route::post('/remove-player-from-community', [EditcomController::class, 'removePlayerFromCommunity']);
 Route::get('/leaderboard', [CoachComController::class, 'leaderboard']);
