@@ -106,7 +106,7 @@ Route::post('/sessions', [CoachComController::class, 'getSessionsByPlanId']);
 Route::get('/communtities', [HomeCommunityController::class, 'getCoachCommunities']);
 Route::get('/players', [HomeCommunityController::class, 'getCoachPlayersStatus']);
 Route::get('/players-count', [HomeCommunityController::class, 'getPremiumCommunityPlayersCount']);
-Route::get('/community-details', [CommunityDetailsController::class, 'CommunityDetailsController']);
+Route::get('/community-details', [CommunityDetailsController::class, 'getCommunityDetails']);
 });
 
 
