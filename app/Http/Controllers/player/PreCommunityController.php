@@ -86,16 +86,14 @@ class PreCommunityController extends Controller
             return response()->json(['error' => 'User is not part of premium community'], 403);
         }
     
-        // دالة للمساعدة في ترتيب المستخدمين وإضافة rank
         $addRank = function ($collection) {
-            $collection = $collection->values(); // إعادة ترتيب الفهرسة
+            $collection = $collection->values(); 
             foreach ($collection as $index => $item) {
                 $item->rank = $index + 1;
             }
             return $collection;
         };
     
-        // === daily leaderboard ===
         $topUsersByDay = DB::table('users')
             ->leftJoin('plandates', function ($join) {
                 $join->on('users.id', '=', 'plandates.user_id')
