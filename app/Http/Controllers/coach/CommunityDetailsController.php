@@ -35,10 +35,18 @@ class CommunityDetailsController extends Controller
         return response()->json(['error' => 'Community not found or unauthorized'], 404);
     }
 
+    // عدد اللاعبين في الكوميونتي
+    $playersCount = User::where('com_pre_id', $community->id)->count();
+
     $plan = $community->plan;
 
     if (!$plan) {
-        return response()->json(['error' => 'No plan associated with this community'], 404);
+        return response()->json([
+            'community_name' => $community->name,
+            'community_code' => $community->code,
+            'players_count' => $playersCount,
+            'sessions' => []
+        ]);
     }
 
     $sessions = $plan->sessions ?? [];
@@ -50,9 +58,11 @@ class CommunityDetailsController extends Controller
     return response()->json([
         'community_name' => $community->name,
         'community_code' => $community->code,
+        'players_count' => $playersCount,
         'sessions' => $sessionData
     ]);
 }
+
 
 
 public function getCommunityPlayersStatus(Request $request)
