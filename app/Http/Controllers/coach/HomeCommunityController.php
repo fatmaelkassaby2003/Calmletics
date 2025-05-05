@@ -62,9 +62,11 @@ public function getCoachPlayersStatus(Request $request)
     // استلام الفلتر من الـ request (all, missed, achievements)
     $statusFilter = $request->query('status'); 
 
+    // تعريف المتغير $now قبل استخدامه
+    $now = \Carbon\Carbon::now();
+
     // فلترة اللاعبين بناءً على الحالة
     if ($statusFilter) {
-        $now = \Carbon\Carbon::now();
         $playersQuery = $playersQuery->get()->filter(function ($player) use ($now, $statusFilter) {
             $lastDone = Doneplan::where('user_id', $player->id)
                 ->where('done', true)
