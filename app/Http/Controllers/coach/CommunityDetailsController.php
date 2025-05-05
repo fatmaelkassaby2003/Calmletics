@@ -5,6 +5,8 @@ namespace App\Http\Controllers\coach;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ComPre;
+use App\Models\Doneplan;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -50,6 +52,80 @@ class CommunityDetailsController extends Controller
         'community_code' => $community->code,
         'sessions' => $sessionData
     ]);
+}
+
+
+public function getCommunityPlayersStatus(Request $request)
+{
+    $coach = Auth::user();
+
+    if (!$coach || $coach->role != 1) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    $communityId = $request->query('community_id');
+    $statusFilter = $request->query('status');
+    $now = \Carbon\Carbon::now();
+
+    $community = Compre::where('id', $communityId)
+                        ->where('user_id', $coach->id)
+                        ->first();
+
+    if (!$community) {
+        return response()->json(['error' => 'Community not found or unauthorized'], 404);
+    }
+
+    $playersQuery = User::where('com_pre_id', $community->id);
+
+    if ($statusFilter) {
+        $playersQuery = $playersQuery->get()->filter(function ($player) use ($now, $statusFilter) {
+            $lastDone = Doneplan::where('user_id', $player->id)
+                ->where('done', true)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            $daysSinceDone = $lastDone ? $lastDone->created_at->diffInDays($now) : null;
+
+            if ($statusFilter === 'achievements' && $daysSinceDone <= 2) {
+                return true;
+            }
+
+            if ($statusFilter === 'missed' && ($daysSinceDone > 2 || is_null($daysSinceDone))) {
+                return true;
+            }
+
+            return false;
+        });
+    } else {
+        $playersQuery = $playersQuery->get();
+    }
+
+    $data = $playersQuery->map(function ($player) use ($now, $community) {
+        $lastDone = Doneplan::where('user_id', $player->id)
+                    ->where('done', true)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+        $daysSinceDone = $lastDone ? $lastDone->created_at->diffInDays($now) : null;
+
+        if (!is_null($daysSinceDone) && $daysSinceDone <= 2) {
+            $statusMessage = 'Player ' . $player->name . ' achieved a personal best in the Anxiety Test';
+            $statusImage = asset('front/images/vector.png');
+        } else {
+            $statusMessage = 'Player ' . $player->name . ' hasn’t logged progress in the last 3 days';
+            $statusImage = asset('front/images/icon.png');
+        }
+
+        return [
+            'player_id' => $player->id,
+            'player_name' => $player->name,
+            'community_name' => $community->name,
+            'status_message' => $statusMessage,
+            'status_image' => $statusImage,
+        ];
+    });
+
+    return response()->json(['players' => $data]);
 }
 
 }

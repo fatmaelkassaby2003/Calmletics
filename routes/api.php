@@ -107,6 +107,7 @@ Route::get('/communtities', [HomeCommunityController::class, 'getCoachCommunitie
 Route::get('/players', [HomeCommunityController::class, 'getCoachPlayersStatus']);
 Route::get('/players-count', [HomeCommunityController::class, 'getPremiumCommunityPlayersCount']);
 Route::get('/community-details', [CommunityDetailsController::class, 'getCommunityDetails']);
+Route::get('/community-members-status', [CommunityDetailsController::class, 'getCommunityPlayersStatus']);
 });
 
 
