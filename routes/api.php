@@ -14,6 +14,7 @@ use App\Http\Controllers\player\HomeController;
 use App\Http\Controllers\coach\CoachComController;
 use App\Http\Controllers\player\PreCommunityController;
 use App\Http\Controllers\AddplanController;
+use App\Http\Controllers\coach\HomeCommunityController;
 use App\Http\Controllers\FileController;
 use App\Models\File;
 use App\Models\Plan;
@@ -101,6 +102,9 @@ Route::get('/plans', [CoachComController::class, 'getPlansByLevel']);
 Route::get('/compre/my-compres', [ProfileController::class, 'getUserCompres']);
 Route::post('/card/store', [CoachComController::class, 'storeCard']);
 Route::post('/sessions', [CoachComController::class, 'getSessionsByPlanId']);
+Route::get('/communtities', [HomeCommunityController::class, 'getCoachCommunities']);
+Route::get('/players', [HomeCommunityController::class, 'getCoachPlayersStatus']);
+Route::get('/players-count', [HomeCommunityController::class, 'getPremiumCommunityPlayersCount']);
 });
 
 
