@@ -91,7 +91,9 @@ public function removePlayerFromCommunity(Request $request)
         return response()->json(['error' => 'Player not found or not in your community'], 404);
     }
 
+    $communityName = optional($player->compre)->name ?? 'Unknown Community';
     $playerName = $player->name;
+
     $player->com_pre_id = null;
     $player->save();
 
@@ -99,7 +101,7 @@ public function removePlayerFromCommunity(Request $request)
     $label = $now->isToday() ? 'today' : 'last';
 
     return response()->json([
-        'message' => "Player '$playerName' has been removed from the community successfully ($label)."
+        'message' => "Player '$playerName' has been removed from the premium community '$communityName' successfully ($label)."
     ]);
 }
 
