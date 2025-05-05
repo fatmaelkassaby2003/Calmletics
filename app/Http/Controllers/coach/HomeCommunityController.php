@@ -12,30 +12,39 @@ use Illuminate\Support\Facades\Auth;
 class HomeCommunityController extends Controller
 {
   
-    public function getCoachCommunities()
-    {
-        $coach = Auth::user();
-    
-        if (!$coach || $coach->role != 1) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-    
-        $communities = Compre::withCount('users')
-            ->where('user_id', $coach->id)
-            ->get();
-    
-        $data = $communities->map(function ($community) {
-            return [
-                'id' => $community->id,
-                'name' => $community->name,
-                'level' => $community->level,
-                'players_count' => $community->users_count,
-                'created_at' => $community->created_at->toDateTimeString(),
-            ];
-        });
-    
-        return response()->json(['communities' => $data]);
+    public function getCoachCommunities(Request $request)
+{
+    $coach = Auth::user();
+
+    if (!$coach || $coach->role != 1) {
+        return response()->json(['error' => 'Unauthorized'], 403);
     }
+
+    $level = $request->query('level'); // القيمة ممكن تكون all, low, moderate, high أو null
+
+    $communitiesQuery = Compre::withCount('users')
+        ->where('user_id', $coach->id);
+
+    // لو المستخدم طلب فلتر محدد غير all
+    if ($level && $level !== 'all') {
+        $communitiesQuery->where('level', $level);
+    }
+
+    $communities = $communitiesQuery->get();
+
+    $data = $communities->map(function ($community) {
+        return [
+            'id' => $community->id,
+            'name' => $community->name,
+            'level' => $community->level,
+            'players_count' => $community->users_count,
+            'created_at' => $community->created_at->toDateTimeString(),
+        ];
+    });
+
+    return response()->json(['communities' => $data]);
+}
+
 
 
     public function getCoachPlayersStatus()
