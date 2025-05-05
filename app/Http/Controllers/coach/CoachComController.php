@@ -49,6 +49,7 @@ class CoachComController extends Controller
             $total = $videoCount + $audioCount + $pdfCount;
     
             return [
+                'plan_id' => $plan->id,
                 'plan_name' => $plan->name,
                 'sessions_count' => $plan->sessions->count(),
                 'video_image' => $videoImage,
@@ -127,6 +128,7 @@ class CoachComController extends Controller
     
             return [
                 'session_number' => 'Session ' . ($index + 1),
+                'session_id' => $session->id,
                 'session_name' => $session->name,
                 'type' => $type,
                 'icon' => $icon,

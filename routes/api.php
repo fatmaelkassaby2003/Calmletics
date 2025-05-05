@@ -97,7 +97,7 @@ Route::middleware(['jwt.auth'])->get('/get-scores-last-7-days', [PlandatesContro
 //////////////////////////////////////////////////////    COACH    ////////////////////////////////////////////////////////////////
 Route::middleware(['jwt.auth'])->prefix('coach')->group(function () {
 Route::post('/compre/create', [CoachComController::class, 'createCompre']);
-Route::post('/plans', [CoachComController::class, 'getPlansByLevel']);
+Route::get('/plans', [CoachComController::class, 'getPlansByLevel']);
 Route::get('/compre/my-compres', [ProfileController::class, 'getUserCompres']);
 Route::post('/card/store', [CoachComController::class, 'storeCard']);
 Route::post('/sessions', [CoachComController::class, 'getSessionsByPlanId']);
