@@ -34,7 +34,7 @@ class EditcomController extends Controller
 
     $community->delete();
 
-    return response()->json(['message' =>$community->name . 'Community deleted successfully']);
+    return response()->json(['message' =>$community->name . ' deleted successfully']);
 }
 
 public function updateCommunityName(Request $request)
