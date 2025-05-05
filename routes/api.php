@@ -14,6 +14,7 @@ use App\Http\Controllers\player\HomeController;
 use App\Http\Controllers\coach\CoachComController;
 use App\Http\Controllers\player\PreCommunityController;
 use App\Http\Controllers\AddplanController;
+use App\Http\Controllers\coach\CommunityDetailsController;
 use App\Http\Controllers\coach\HomeCommunityController;
 use App\Http\Controllers\FileController;
 use App\Models\File;
@@ -105,6 +106,7 @@ Route::post('/sessions', [CoachComController::class, 'getSessionsByPlanId']);
 Route::get('/communtities', [HomeCommunityController::class, 'getCoachCommunities']);
 Route::get('/players', [HomeCommunityController::class, 'getCoachPlayersStatus']);
 Route::get('/players-count', [HomeCommunityController::class, 'getPremiumCommunityPlayersCount']);
+Route::get('/community-details', [CommunityDetailsController::class, 'CommunityDetailsController']);
 });
 
 
