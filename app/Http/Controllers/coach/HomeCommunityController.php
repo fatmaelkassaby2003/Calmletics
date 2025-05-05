@@ -47,7 +47,7 @@ class HomeCommunityController extends Controller
 
 
 
-    public function getCoachPlayersStatus()
+public function getCoachPlayersStatus(Request $request)
 {
     $coach = Auth::user();
 
@@ -56,12 +56,45 @@ class HomeCommunityController extends Controller
     }
 
     $communityIds = Compre::where('user_id', $coach->id)->pluck('id');
+    
+    $playersQuery = User::whereIn('com_pre_id', $communityIds);
 
-    $players = User::whereIn('com_pre_id', $communityIds)->get();
+    // استلام الفلتر من الـ request (all, missed, achievements)
+    $statusFilter = $request->query('status'); 
 
-    $now = \Carbon\Carbon::now();
+    // فلترة اللاعبين بناءً على الحالة
+    if ($statusFilter) {
+        $now = \Carbon\Carbon::now();
+        $playersQuery = $playersQuery->get()->filter(function ($player) use ($now, $statusFilter) {
+            $lastDone = Doneplan::where('user_id', $player->id)
+                ->where('done', true)
+                ->orderBy('created_at', 'desc')
+                ->first();
 
-    $data = $players->map(function ($player) use ($now) {
+            if ($lastDone) {
+                $daysSinceDone = $lastDone->created_at->diffInDays($now);
+            } else {
+                $daysSinceDone = null;
+            }
+
+            // تطبيق الفلتر حسب الحالة المطلوبة
+            if ($statusFilter === 'achievements' && $daysSinceDone <= 2) {
+                return true; // يعرض اللاعبين الاكتيفين
+            }
+
+            if ($statusFilter === 'missed' && ($daysSinceDone > 2 || is_null($daysSinceDone))) {
+                return true; // يعرض اللاعبين غير الاكتيفين
+            }
+
+            return false;
+        });
+    } else {
+        // لو لم يتم تحديد الفلتر، نرجع كل اللاعبين
+        $playersQuery = $playersQuery->get();
+    }
+
+    // تجهيز البيانات
+    $data = $playersQuery->map(function ($player) use ($now) {
         $communityName = optional($player->compre)->name ?? 'غير معروف';
         $lastDone = Doneplan::where('user_id', $player->id)
                     ->where('done', true)
@@ -75,10 +108,10 @@ class HomeCommunityController extends Controller
         }
 
         if (!is_null($daysSinceDone) && $daysSinceDone <= 2) {
-            $statusMessage = 'Player Alex Taylor achieved a personal best in the Anxiety Test';
+            $statusMessage = 'Player ' . $player->name . ' achieved a personal best in the Anxiety Test';
             $statusImage = asset('front/images/vector.png');
         } else {
-            $statusMessage = 'hasn’t logged progress in the last 3 days';
+            $statusMessage = 'Player ' . $player->name . ' hasn’t logged progress in the last 3 days';
             $statusImage = asset('front/images/icon.png');
         }
 
