@@ -15,6 +15,7 @@ use App\Http\Controllers\coach\CoachComController;
 use App\Http\Controllers\player\PreCommunityController;
 use App\Http\Controllers\AddplanController;
 use App\Http\Controllers\coach\CommunityDetailsController;
+use App\Http\Controllers\coach\EditcomController;
 use App\Http\Controllers\coach\HomeCommunityController;
 use App\Http\Controllers\FileController;
 use App\Models\File;
@@ -108,6 +109,9 @@ Route::get('/players', [HomeCommunityController::class, 'getCoachPlayersStatus']
 Route::get('/players-count', [HomeCommunityController::class, 'getPremiumCommunityPlayersCount']);
 Route::get('/community-details', [CommunityDetailsController::class, 'getCommunityDetails']);
 Route::get('/community-members-status', [CommunityDetailsController::class, 'getCommunityPlayersStatus']);
+Route::get('/delete-community', [EditcomController::class, 'deleteCommunity']);
+Route::post('/update-community-name', [EditcomController::class, 'updateCommunityName']);
+Route::post('/remove-player-from-community', [EditcomController::class, 'removePlayerFromCommunity']);
 });
 
 

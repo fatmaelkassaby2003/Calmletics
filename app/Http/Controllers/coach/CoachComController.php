@@ -71,17 +71,17 @@ class CoachComController extends Controller
         if (Auth::user()->role != 1) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-
+    
         $request->validate([
             'name' => 'required|string|max:255',
             'level' => 'required|string|max:50',
             'plan_id' => 'required|exists:plans,id',
         ]);
-
+    
         do {
             $code = rand(1000, 9999);
         } while (ComPre::where('code', $code)->exists());
-
+    
         $compre = ComPre::create([
             'name' => $request->name,
             'level' => $request->level,
@@ -89,14 +89,15 @@ class CoachComController extends Controller
             'code' => $code,
             'user_id' => Auth::id(), 
         ]);
-
+    
+        $now = \Carbon\Carbon::now();
+        $createdLabel = $now->isToday() ? 'today' : 'last';
+    
         return response()->json([
-            'message' => 'Compre created successfully!',
+            'message' => "Community '{$compre->name}' created with code {$compre->code} ($createdLabel).",
             'data' => $compre
         ], 201);
-    }
-
-
+    }    
     public function getSessionsByPlanId(Request $request)
     {
         if (!Auth::check() || Auth::user()->role != 1) {
