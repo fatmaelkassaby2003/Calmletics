@@ -177,7 +177,7 @@ class CoachComController extends Controller
     
         $community = ComPre::find($community_id);
         if (!$community) {
-            return response()->json(['error' => 'community'], 403);
+            return response()->json(['error' => 'community not found'], 403);
         }
     
         // دالة لترتيب المستخدمين وإضافة rank
