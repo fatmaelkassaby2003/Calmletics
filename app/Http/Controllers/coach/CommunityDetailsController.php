@@ -14,49 +14,59 @@ use Illuminate\Support\Facades\Auth;
 class CommunityDetailsController extends Controller
 {
     public function getCommunityDetails(Request $request)
-    {
-        $coach = Auth::user();
-    
-        if (!$coach || $coach->role != 1) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-    
-        $communityId = $request->input('community_id');
-    
-        if (!$communityId) {
-            return response()->json(['error' => 'Community ID is required'], 400);
-        }
-    
-        $community = ComPre::where('id', $communityId)
-                            ->where('user_id', $coach->id)
-                            ->first();
-    
-        if (!$community) {
-            return response()->json(['error' => 'Community not found or unauthorized'], 404);
-        }
-    
-        // عدد اللاعبين وأسماؤهم
-        $players = User::where('com_pre_id', $community->id)->get(['id', 'name']);
-        $playersCount = $players->count();
-    
-        $plan = $community->plan;
-    
-        $sessions = $plan ? ($plan->sessions ?? []) : [];
-    
-        $sessionData = collect($sessions)->values()->map(function ($session, $index) {
-            return 'Session ' . ($index + 1) . ': ' . $session->name;
-        });
-    
-        return response()->json([
-            'community_id' => $community->id,
-            'community_name' => $community->name,
-            'community_code' => $community->code,
-            'players_count' => $playersCount,
-            'players' => $players,
-            'sessions' => $sessionData
-        ]);
+{
+    $coach = Auth::user();
+
+    if (!$coach || $coach->role != 1) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    $communityId = $request->input('community_id');
+
+    if (!$communityId) {
+        return response()->json(['error' => 'Community ID is required'], 400);
+    }
+
+    $community = ComPre::where('id', $communityId)
+                        ->where('user_id', $coach->id)
+                        ->first();
+
+    if (!$community) {
+        return response()->json(['error' => 'Community not found or unauthorized'], 404);
+    }
+
+    $players = User::where('com_pre_id', $community->id)->get(['id', 'name']);
+    $playersCount = $players->count();
+    $playerIds = $players->pluck('id');
+
+    $plan = $community->plan;
+    $sessions = $plan ? ($plan->sessions ?? []) : [];
+
+    $sessionData = collect($sessions)->values()->map(function ($session, $index) use ($playerIds, $playersCount) {
+        $doneCount = \App\Models\Doneplan::where('session_id', $session->id)
+                        ->whereIn('user_id', $playerIds)
+                        ->where('done', true)
+                        ->count();
+
+        $percentage = $playersCount > 0 ? round(($doneCount / $playersCount) * 100, 2) : 0;
+
+        return [
+            'session_number' => 'Session ' . ($index + 1),
+            'session_name' => $session->name,
+            'completion_percentage' => $percentage . '%'
+        ];
+    });
+
+    return response()->json([
+        'community_id' => $community->id,
+        'community_name' => $community->name,
+        'community_code' => $community->code,
+        'players_count' => $playersCount,
+        'players' => $players,
+        'sessions' => $sessionData
+    ]);
 }
-    
+
 public function getCommunityPlayersStatus(Request $request)
 {
     $coach = Auth::user();
