@@ -35,19 +35,25 @@ class CommunityDetailsController extends Controller
         return response()->json(['error' => 'Community not found or unauthorized'], 404);
     }
 
-    $players = User::where('com_pre_id', $community->id)->get(['id', 'name']);
+    // جلب جميع اللاعبين داخل الكومينتي باستثناء الكوتش نفسه
+    $players = User::where('com_pre_id', $community->id)
+                    ->where('id', '!=', $coach->id)
+                    ->get(['id', 'name']);
+
     $playersCount = $players->count();
-    $playerIds = $players->pluck('id');
 
     $plan = $community->plan;
+
     $sessions = $plan ? ($plan->sessions ?? []) : [];
 
-    $sessionData = collect($sessions)->values()->map(function ($session, $index) use ($playerIds, $playersCount) {
-        $doneCount = \App\Models\Doneplan::where('session_id', $session->id)
-                        ->whereIn('user_id', $playerIds)
-                        ->where('done', true)
-                        ->count();
+    $sessionData = collect($sessions)->values()->map(function ($session, $index) use ($players, $playersCount) {
+        // حساب عدد اللاعبين الذين أتموا هذه الجلسة
+        $doneCount = Doneplan::where('session_id', $session->id)
+                             ->where('done', true)
+                             ->whereIn('user_id', $players->pluck('id'))
+                             ->count();
 
+        // تجنب القسمة على صفر
         $percentage = $playersCount > 0 ? round(($doneCount / $playersCount) * 100, 2) : 0;
 
         return [
