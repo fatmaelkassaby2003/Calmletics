@@ -44,8 +44,16 @@ class FreeCommunityController extends Controller
     public function community(Request $request)
     {
         $user = User::find(auth()->id());
-        $com_free_id = $user->comfree->id;
-        $users = user::where('com_free_id', $com_free_id)->where('id', '!=', $user->id)->select('name','image')->get();
+        if ($user->com_free_id) {
+            $com_free_id = $user->comfree->id;
+            $users = user::where('com_free_id', $com_free_id)->where('id', '!=', $user->id)->select('name','image')->get();        }
+        elseif ($user->com_pre_id) {
+            $com_pre_id = $user->compre->id;
+            $users = user::where('com_pre_id', $com_pre_id)->where('id', '!=', $user->id)->select('name','image')->get();
+        }
+        else {
+            return response()->json(['error' => 'User is not part of any community'], 403);
+        }
         return response()->json($users);
     }
     
