@@ -85,6 +85,7 @@ class CoachComController extends Controller
         } while (ComPre::where('code', $code)->exists());
     
         $compre = ComPre::create([
+            'community_id' => Auth::user()->community_id,
             'name' => $request->name,
             'level' => $request->level,
             'plan_id' => $request->plan_id,
