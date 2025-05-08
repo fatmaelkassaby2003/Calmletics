@@ -62,16 +62,13 @@ public function storeSession(Request $request)
         [
             'folder' => 'sessions/files',
             'resource_type' => $resourceType,
-            'public_id' => 'session_' . uniqid(), // اسم فريد اختياري
+            'public_id' => 'session_' . uniqid(),
             'use_filename' => true,
             'unique_filename' => false,
         ]
     );
 
-    $fileUrl = $uploadResult->getSecurePath();
-    if (in_array($extension, ['pdf', 'txt'])) {
-        $fileUrl .= '?fl_attachment'; // تحميل مباشر بدل العرض
-    }
+    $fileUrl = $uploadResult->getSecurePath(); // لا نضيف ?fl_attachment لعرض الـ PDF داخل المتصفح
 
     $session = Session::create([
         'name' => $request->name,
