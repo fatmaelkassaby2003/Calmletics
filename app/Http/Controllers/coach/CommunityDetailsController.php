@@ -38,7 +38,7 @@ class CommunityDetailsController extends Controller
     // جلب جميع اللاعبين داخل الكومينتي باستثناء الكوتش نفسه
     $players = User::where('com_pre_id', $community->id)
                     ->where('id', '!=', $coach->id)
-                    ->get(['id', 'name']);
+                    ->get(['id', 'name','image','score']);
 
     $playersCount = $players->count();
 

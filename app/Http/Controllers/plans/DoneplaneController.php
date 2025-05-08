@@ -18,50 +18,60 @@ class DoneplaneController extends Controller
     {
         $user = auth()->user();
         $session_number = $request->session_id;
-        if ($user->com_free_id ) {
+    
+        $request->validate([
+            'session_id' => 'required|integer',
+            'feeling' => 'required|string|max:255',
+            'note' => 'nullable|string|max:1000',
+        ]);
+    
+        if ($user->com_free_id) {
             $plan_id = $user->comFree->plan_id;
-        } else if ($user->com_pre_id) {
+        } elseif ($user->com_pre_id) {
             $plan_id = $user->comPre->plan_id;
-        }elseif ($user->plan_id) {
+        } elseif ($user->plan_id) {
             $plan_id = $user->plan_id;
-        }else {
+        } else {
             return response()->json([
-                'message' => "user havn't plan ⏳"
+                'message' => "user hasn't plan ⏳"
             ], 403);
         }
-
-    $today = Carbon::today()->toDateString();
-    $exists = DB::table('doneplans')
-    ->where('user_id', $user->id)
-    ->where('session_id', $session_number)
-    ->exists();
     
-    if ($exists) {
-        return response()->json([
-            'message' => 'This content has already been completed.'
-        ], 400);
-    } else {
+        $today = Carbon::today()->toDateString();
+    
+        $exists = DB::table('doneplans')
+            ->where('user_id', $user->id)
+            ->where('session_id', $session_number)
+            ->exists();
+    
+        if ($exists) {
+            return response()->json([
+                'message' => 'This content has already been completed.'
+            ], 400);
+        }
+    
         DB::table('doneplans')->insert([
             'user_id' => $user->id,
             'plan_id' => $plan_id,
             'session_id' => $session_number,
             'done' => true,
+            'feeling' => $request->feeling,
+            'note' => $request->note,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-    }
-         $planDate = Plandate::Create(
-            ['date' => $today,
-             'user_id' => $user->id, 
-            'score' => 10]
-         );
+    
+        Plandate::create([
+            'date' => $today,
+            'user_id' => $user->id,
+            'score' => 10,
+        ]);
     
         return response()->json([
-            'message' => 'Score saved successfully',
+            'message' => 'Score and feedback saved successfully',
         ], 200);
     }
-      
-    public function getsessions(Request $request)
+        public function getsessions(Request $request)
     {
         $user = User::find(auth()->id());
     
