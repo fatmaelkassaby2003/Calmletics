@@ -38,7 +38,7 @@ class HomeCommunityController extends Controller
             'name' => $community->name,
             'level' => $community->level,
             'players_count' => $community->users_count,
-            'created_at' => $community->created_at->toDateTimeString(),
+            'created_at' => $community->created_at->toDateString(),
         ];
     });
 
