@@ -91,11 +91,14 @@ class DoneplaneController extends Controller
                 'message' => 'This plan has already been completed.'
             ]);
         }
-        $content_type = asset('front/images/subtitle.png'); 
-        if (Str::endsWith($content->content, '.mp3')) {
+        if($content->type == 1){
+            $content_type = asset('front/images/vr.png'); 
+        }elseif(Str::endsWith($content->content, '.mp3')){
             $content_type = asset('/front/images/audio-icon.png');
-        } elseif (Str::endsWith($content->content, '.mp4')) {
+        }elseif (Str::endsWith($content->content, '.mp4')) {
             $content_type = asset('/front/images/vidio-icon.png');
+        }else{
+            $content_type = asset('front/images/subtitle.png'); 
         }
         $contents = DB::table('sessions')
         ->where('plan_id', $plan_id)
@@ -103,12 +106,10 @@ class DoneplaneController extends Controller
         ->get();
         
         $numberedList = [];
-        
         foreach ($contents as $index => $session) {
             $sessionNumber = $session->id;
             $sessionName = $session->name;
             $order = $index + 1;
-
             if ($order < $nextContentNumber) {  
                 $status = asset('front/images/done-icon.png');
             } elseif ($order == $nextContentNumber) {
@@ -116,15 +117,13 @@ class DoneplaneController extends Controller
         } else {
             $status = asset('front/images/lock-icon.png');
         }
-
         $numberedList[] = [
             'session_id' => $sessionNumber,
             'session_name' => $sessionName,
             'session_number' => "session $order",
             'status' => $status,
         ];
-    }
-    
+    }    
     $completedSessionsCount = DB::table('doneplans')
     ->where('user_id', $user->id)
     ->where('done', true)
@@ -145,8 +144,13 @@ class DoneplaneController extends Controller
         $content = DB::table('sessions')
         ->where('id', $content_id)
         ->first();
+        $key_active = false;
+        if($content->type == 1 && $user->com_pre_id != null){
+            $key_active = true;
+        }
         return response()->json([
-            'content' => $content->content
+            'content' => $content->content,
+            'key_active' => $key_active
         ], 200);
     }
 }
