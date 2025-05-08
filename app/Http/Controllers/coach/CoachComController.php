@@ -98,7 +98,8 @@ class CoachComController extends Controller
     
         return response()->json([
             'message' => "Community '{$compre->name}' created with code {$compre->code} ($createdLabel).",
-            'data' => $compre
+            'data' => $compre,
+            'community_id' => $compre->community_id
         ], 201);
     }    
     public function getSessionsByPlanId(Request $request)
