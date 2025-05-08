@@ -65,7 +65,6 @@ class DoneplaneController extends Controller
     {
         $user = User::find(auth()->id());
     
-        // تحديد خطة المستخدم
         if ($user->com_free_id) {
             $plan_id = $user->comFree->plan_id;
         } elseif ($user->com_pre_id) {
@@ -78,7 +77,6 @@ class DoneplaneController extends Controller
             ], 403);
         }
     
-        // جلب كل الجلسات المرتبطة بالخطة
         $contents = DB::table('sessions')
             ->where('plan_id', $plan_id)
             ->orderBy('id')
@@ -90,14 +88,12 @@ class DoneplaneController extends Controller
             ]);
         }
     
-        // معرفة الجلسات المكتملة للمستخدم
         $completedSessionIds = DB::table('doneplans')
             ->where('user_id', $user->id)
             ->where('done', true)
             ->pluck('session_id')
             ->toArray();
     
-        // ترتيب الجلسات واستنتاج الجلسة التالية
         $nextSession = null;
         foreach ($contents as $session) {
             if (!in_array($session->id, $completedSessionIds)) {
@@ -106,14 +102,12 @@ class DoneplaneController extends Controller
             }
         }
     
-        // لو خلص كل الجلسات
         if (!$nextSession) {
             return response()->json([
                 'message' => 'This plan has already been completed.'
             ]);
         }
     
-        // تحديد نوع الجلسة المفتوحة حاليًا
         if ($nextSession->type == 1) {
             $content_type = asset('front/images/vr.png');
         } elseif (Str::endsWith($nextSession->content, '.mp3')) {
@@ -124,7 +118,6 @@ class DoneplaneController extends Controller
             $content_type = asset('front/images/subtitle.png');
         }
     
-        // بناء قائمة الجلسات مع الحالة
         $numberedList = [];
         foreach ($contents as $i => $session) {
             $order = $i + 1;
@@ -145,12 +138,10 @@ class DoneplaneController extends Controller
             ];
         }
     
-        // حساب النسبة
         $count = $contents->count();
         $completedCount = count($completedSessionIds);
         $percentage = $count > 0 ? ($completedCount / $count) * 100 : 0;
     
-        // حفظ النسبة
         $user->Percentage = $percentage;
         $user->save();
     
@@ -184,6 +175,8 @@ class DoneplaneController extends Controller
         return response()->json([
             'session_id' => $content->id,
             'content' => $content->content,
+            'task' => $content->task,
+            'practical' => $content->practical,
             'key_active' => $key_active,
             'booksession' => $booksession
         ], 200);
