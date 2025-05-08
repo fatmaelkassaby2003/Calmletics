@@ -72,7 +72,6 @@ public function storeSession(Request $request)
         ]
     );
 
-    // إنشاء السجّل
     $session = Session::create([
         'name' => $request->name,
         'content' => $uploadResult->getSecurePath(),
@@ -82,7 +81,6 @@ public function storeSession(Request $request)
         'practical' => $request->practical
     ]);
 
-    // تعديل الرابط لتحميل ملفات معينة مباشرة (مثل PDF و TXT)
     $fileUrl = $uploadResult->getSecurePath();
     if (in_array($extension, ['pdf', 'txt'])) {
         $fileUrl .= '?fl_attachment';
