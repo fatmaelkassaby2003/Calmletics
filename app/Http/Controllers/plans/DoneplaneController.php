@@ -167,13 +167,43 @@ class DoneplaneController extends Controller
         $content = DB::table('sessions')
         ->where('id', $content_id)
         ->first();
+        if (!$content) {
+            return response()->json([
+                'message' => 'no content here.'
+            ]);
+        }
+        $booksession = DB::table('session_books')
+        ->where('session_id', $content_id)
+        ->where('user_id', $user->id)
+        ->select( 'day', 'time')
+        ->first();
         $key_active = false;
         if($content->type == 1 && $user->com_pre_id != null){
             $key_active = true;
         }
         return response()->json([
+            'session_id' => $content->id,
             'content' => $content->content,
-            'key_active' => $key_active
+            'key_active' => $key_active,
+            'booksession' => $booksession
+        ], 200);
+    }
+
+    public function booksession(Request $request){
+        $user = auth()->user();
+        $session_id = $request->session_id;
+        $year = $request->year;
+        $day = $request->day;
+        $time = $request->time;
+        DB::table('session_books')->insert([
+            'user_id' => $user->id,
+            'session_id' => $session_id,
+            'year' => $year,
+            'day' => $day,
+            'time' => $time,
+        ]);
+        return response()->json([
+            'message' => 'booked session successfully.'
         ], 200);
     }
 }
