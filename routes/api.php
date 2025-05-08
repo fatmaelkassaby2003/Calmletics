@@ -14,6 +14,7 @@ use App\Http\Controllers\player\HomeController;
 use App\Http\Controllers\coach\CoachComController;
 use App\Http\Controllers\player\PreCommunityController;
 use App\Http\Controllers\AddplanController;
+use App\Http\Controllers\coach\BooksessionController;
 use App\Http\Controllers\coach\CommunityDetailsController;
 use App\Http\Controllers\coach\EditcomController;
 use App\Http\Controllers\coach\HomeCommunityController;
@@ -117,6 +118,7 @@ Route::post('/delete-community', [EditcomController::class, 'deleteCommunity']);
 Route::post('/update-community-name', [EditcomController::class, 'updateCommunityName']);
 Route::post('/remove-player-from-community', [EditcomController::class, 'removePlayerFromCommunity']);
 Route::get('/leaderboard', [CoachComController::class, 'leaderboard']);
+Route::get('/booked-sessions', [BooksessionController::class, 'booksession']);
 
 });
 
