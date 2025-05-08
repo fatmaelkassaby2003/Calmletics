@@ -45,33 +45,34 @@ public function storeSession(Request $request)
     $request->validate([
         'name' => 'required|string|max:255',
         'plan_id' => 'required|exists:plans,id',
-        'file' => 'required|file|mimes:mp4,mp3,pdf,txt|max:10240',
+        'file' => 'required|file|mimes:mp4,mp3,pdf|max:10240',
         'type' => 'required|string|max:255',
         'task' => 'required|string|max:255',
         'practical' => 'required|string|max:255',
     ]);
 
     $file = $request->file('file');
-    $extension = strtolower($file->getClientOriginalExtension());
+    $extension = strtolower($file->getClientOriginalExtension()); // التأكد من أن الامتداد بحروف صغيرة
 
-    // تحديد نوع المورد بناءً على الامتداد
-    $resourceType = 'raw'; // الافتراضي
+    // تحديد نوع المورد بناءً على امتداد الملف
+    $resourceType = 'raw'; // الافتراضي لملفات PDF
     if (in_array($extension, ['mp4', 'mp3'])) {
-        $resourceType = 'video';
+        $resourceType = 'video'; // لملفات الفيديو والصوت
     }
 
-    // رفع الملف إلى Cloudinary
+    // رفع الملف إلى Cloudinary مع الإعدادات الصحيحة
     $uploadResult = Cloudinary::uploadFile(
         $file->getRealPath(),
         [
             'folder' => 'sessions/files',
             'upload_preset' => 'public_raw',
             'resource_type' => $resourceType,
-            'access_mode' => 'public',
-            'filename_override' => uniqid() . '.' . $extension
+            'access_mode' => 'public', // للتأكد من أن الملف قابل للوصول
+            'filename_override' => uniqid() . '.' . $extension // تجنب مشاكل الأسماء المكررة
         ]
     );
 
+    // إنشاء السيشين في قاعدة البيانات
     $session = Session::create([
         'name' => $request->name,
         'content' => $uploadResult->getSecurePath(),
@@ -81,14 +82,16 @@ public function storeSession(Request $request)
         'practical' => $request->practical
     ]);
 
+    // إضافة معلمة fl_attachment لملفات PDF لضمان تحميلها بدلاً من معاينتها
     $fileUrl = $uploadResult->getSecurePath();
-    if (in_array($extension, ['pdf', 'txt'])) {
+    if ($extension === 'pdf') {
         $fileUrl .= '?fl_attachment';
     }
 
     return response()->json([
         'message' => 'تم إنشاء السيشن ورفع الملف بنجاح',
         'session' => $session,
+        'file_url' => $fileUrl
     ], 201);
 }
 
