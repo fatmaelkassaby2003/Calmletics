@@ -35,7 +35,6 @@ class CommunityDetailsController extends Controller
         return response()->json(['error' => 'Community not found or unauthorized'], 404);
     }
 
-    // جلب جميع اللاعبين داخل الكومينتي باستثناء الكوتش نفسه
     $players = User::where('com_pre_id', $community->id)
                     ->where('id', '!=', $coach->id)
                     ->get(['id', 'name','image','score']);
@@ -140,6 +139,7 @@ public function getCommunityPlayersStatus(Request $request)
             'community_name' => $community->name,
             'status_message' => $statusMessage,
             'status_image' => $statusImage,
+            'image'=> $player->image
         ];
     });
 

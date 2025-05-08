@@ -117,6 +117,7 @@ public function getCoachPlayersStatus(Request $request)
             'community_name' => $communityName,
             'status_message' => $statusMessage,
             'status_image' => $statusImage,
+            'image' => $player->image,
         ];
     });
 
