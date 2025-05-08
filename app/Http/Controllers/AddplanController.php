@@ -41,6 +41,7 @@ class AddplanController extends Controller
     
 public function storeSession(Request $request)
 {
+    // التحقق من صحة البيانات
     $request->validate([
         'name' => 'required|string|max:255',
         'plan_id' => 'required|exists:plans,id',
@@ -51,31 +52,48 @@ public function storeSession(Request $request)
     ]);
 
     $file = $request->file('file');
+    $extension = strtolower($file->getClientOriginalExtension()); // التأكد من أن الامتداد بحروف صغيرة
 
-    $uploadedFileUrl = Cloudinary::uploadFile(
+    // تحديد نوع المورد بناءً على امتداد الملف
+    $resourceType = 'raw'; // الافتراضي لملفات PDF
+    if (in_array($extension, ['mp4', 'mp3'])) {
+        $resourceType = 'video'; // لملفات الفيديو والصوت
+    }
+
+    // رفع الملف إلى Cloudinary مع الإعدادات الصحيحة
+    $uploadResult = Cloudinary::uploadFile(
         $file->getRealPath(),
         [
-            'resource_type' => 'raw', 
             'folder' => 'sessions/files',
-            'type' => 'upload',
             'upload_preset' => 'public_raw',
-            'access_mode' => 'public' // إضافة هذا السطر
+            'resource_type' => $resourceType,
+            'access_mode' => 'public', // للتأكد من أن الملف قابل للوصول
+            'filename_override' => uniqid() . '.' . $extension // تجنب مشاكل الأسماء المكررة
         ]
-    )->getSecurePath();
+    );
 
+    // إنشاء السيشين في قاعدة البيانات
     $session = Session::create([
         'name' => $request->name,
-        'content' => $uploadedFileUrl,
+        'content' => $uploadResult->getSecurePath(),
         'plan_id' => $request->plan_id,
         'type' => $request->type,
         'task' => $request->task,
         'practical' => $request->practical
     ]);
 
+    // إضافة معلمة fl_attachment لملفات PDF لضمان تحميلها بدلاً من معاينتها
+    $fileUrl = $uploadResult->getSecurePath();
+    if ($extension === 'pdf') {
+        $fileUrl .= '?fl_attachment';
+    }
+
     return response()->json([
-        'message' => 'تم إنشاء السيشن وربطها بالبلان بنجاح',
+        'message' => 'تم إنشاء السيشن ورفع الملف بنجاح',
         'session' => $session,
-    ]);
+        'file_url' => $fileUrl
+    ], 201);
 }
+
 }
 
