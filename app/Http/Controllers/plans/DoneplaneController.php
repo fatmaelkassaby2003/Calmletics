@@ -64,80 +64,103 @@ class DoneplaneController extends Controller
     public function getsessions(Request $request)
     {
         $user = User::find(auth()->id());
-        if ($user->com_free_id ) {
+    
+        // تحديد خطة المستخدم
+        if ($user->com_free_id) {
             $plan_id = $user->comFree->plan_id;
-        } else if ($user->com_pre_id) {
+        } elseif ($user->com_pre_id) {
             $plan_id = $user->comPre->plan_id;
-        }elseif ($user->plan_id) {
+        } elseif ($user->plan_id) {
             $plan_id = $user->plan_id;
-        }else {
+        } else {
             return response()->json([
-                'message' => "user havn't plan ⏳"
+                'message' => "User doesn't have a plan ⏳"
             ], 403);
         }
-   
-        $lastCompleted = DB::table('doneplans')
+    
+        // جلب كل الجلسات المرتبطة بالخطة
+        $contents = DB::table('sessions')
+            ->where('plan_id', $plan_id)
+            ->orderBy('id')
+            ->get();
+    
+        if ($contents->isEmpty()) {
+            return response()->json([
+                'message' => 'No sessions found for this plan.'
+            ]);
+        }
+    
+        // معرفة الجلسات المكتملة للمستخدم
+        $completedSessionIds = DB::table('doneplans')
             ->where('user_id', $user->id)
             ->where('done', true)
-            ->max('session_id');
+            ->pluck('session_id')
+            ->toArray();
     
-        $nextContentNumber = $lastCompleted ? $lastCompleted + 1 : 1;
-        $content = DB::table('sessions')
-        ->where('plan_id', $plan_id)
-        ->where('id', $nextContentNumber)
-        ->first();
-        if(!$content){
+        // ترتيب الجلسات واستنتاج الجلسة التالية
+        $nextSession = null;
+        foreach ($contents as $session) {
+            if (!in_array($session->id, $completedSessionIds)) {
+                $nextSession = $session;
+                break;
+            }
+        }
+    
+        // لو خلص كل الجلسات
+        if (!$nextSession) {
             return response()->json([
                 'message' => 'This plan has already been completed.'
             ]);
         }
-        if($content->type == 1){
-            $content_type = asset('front/images/vr.png'); 
-        }elseif(Str::endsWith($content->content, '.mp3')){
-            $content_type = asset('/front/images/audio-icon.png');
-        }elseif (Str::endsWith($content->content, '.mp4')) {
-            $content_type = asset('/front/images/vidio-icon.png');
-        }else{
-            $content_type = asset('front/images/subtitle.png'); 
-        }
-        $contents = DB::table('sessions')
-        ->where('plan_id', $plan_id)
-        ->orderBy('id')
-        ->get();
-        
-        $numberedList = [];
-        foreach ($contents as $index => $session) {
-            $sessionNumber = $session->id;
-            $sessionName = $session->name;
-            $order = $index + 1;
-            if ($order < $nextContentNumber) {  
-                $status = asset('front/images/done-icon.png');
-            } elseif ($order == $nextContentNumber) {
-                $status = $content_type;
+    
+        // تحديد نوع الجلسة المفتوحة حاليًا
+        if ($nextSession->type == 1) {
+            $content_type = asset('front/images/vr.png');
+        } elseif (Str::endsWith($nextSession->content, '.mp3')) {
+            $content_type = asset('front/images/audio-icon.png');
+        } elseif (Str::endsWith($nextSession->content, '.mp4')) {
+            $content_type = asset('front/images/vidio-icon.png');
         } else {
-            $status = asset('front/images/lock-icon.png');
+            $content_type = asset('front/images/subtitle.png');
         }
-        $numberedList[] = [
-            'session_id' => $sessionNumber,
-            'session_name' => $sessionName,
-            'session_number' => "session $order",
-            'status' => $status,
-        ];
-    }    
-    $completedSessionsCount = DB::table('doneplans')
-    ->where('user_id', $user->id)
-    ->where('done', true)
-    ->count();
-    $count = $contents->count();
-    $Percentage = ($completedSessionsCount / $count) * 100;
-    $user->Percentage = $Percentage;
-    $user->save();
-    return response()->json([
-        'count' => $count,
-        'Percentage' => $Percentage . ' %',
-        'session_list' => $numberedList
+    
+        // بناء قائمة الجلسات مع الحالة
+        $numberedList = [];
+        foreach ($contents as $i => $session) {
+            $order = $i + 1;
+    
+            if (in_array($session->id, $completedSessionIds)) {
+                $status = asset('front/images/done-icon.png');
+            } elseif ($session->id == $nextSession->id) {
+                $status = $content_type;
+            } else {
+                $status = asset('front/images/lock-icon.png');
+            }
+    
+            $numberedList[] = [
+                'session_id' => $session->id,
+                'session_name' => $session->name,
+                'session_number' => "Session $order",
+                'status' => $status,
+            ];
+        }
+    
+        // حساب النسبة
+        $count = $contents->count();
+        $completedCount = count($completedSessionIds);
+        $percentage = $count > 0 ? ($completedCount / $count) * 100 : 0;
+    
+        // حفظ النسبة
+        $user->Percentage = $percentage;
+        $user->save();
+    
+        return response()->json([
+            'count' => $count,
+            'Percentage' => round($percentage, 2) . ' %',
+            'session_list' => $numberedList
         ]);
     }
+    
     public function getsession_content(Request $request){
         $user = auth()->user();
         $content_id = $request->session_id;
