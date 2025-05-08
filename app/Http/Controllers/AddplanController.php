@@ -54,39 +54,39 @@ public function storeSession(Request $request)
     $file = $request->file('file');
     $extension = strtolower($file->getClientOriginalExtension());
 
-    // تحديد نوع المورد بناءً على الامتداد
-    $resourceType = 'raw'; // الافتراضي
+    // تحديد نوع المورد (resource type)
+    $resourceType = 'raw';
     if (in_array($extension, ['mp4', 'mp3'])) {
         $resourceType = 'video';
     }
 
-    // رفع الملف إلى Cloudinary
+    // رفع الملف على Cloudinary
     $uploadResult = Cloudinary::uploadFile(
         $file->getRealPath(),
         [
             'folder' => 'sessions/files',
-            'upload_preset' => 'public_raw',
+            'upload_preset' => 'public_raw', // تأكد من أن preset يسمح بالرفع كـ raw
             'resource_type' => $resourceType,
             'access_mode' => 'public',
             'filename_override' => uniqid() . '.' . $extension
         ]
     );
 
-    // إنشاء السجّل
+    // تعديل الرابط إذا كان PDF أو TXT ليتم عرضه بشكل صحيح
+    $fileUrl = $uploadResult->getSecurePath();
+    if (in_array($extension, ['pdf', 'txt'])) {
+        $fileUrl = str_replace('/image/upload/', '/raw/upload/', $fileUrl);
+    }
+
+    // إنشاء السجل
     $session = Session::create([
         'name' => $request->name,
-        'content' => $uploadResult->getSecurePath(),
+        'content' => $fileUrl,
         'plan_id' => $request->plan_id,
         'type' => $request->type,
         'task' => $request->task,
         'practical' => $request->practical
     ]);
-
-    // تعديل الرابط لتحميل ملفات معينة مباشرة (مثل PDF و TXT)
-    $fileUrl = $uploadResult->getSecurePath();
-    if (in_array($extension, ['pdf', 'txt'])) {
-        $fileUrl .= '?fl_attachment';
-    }
 
     return response()->json([
         'message' => 'تم إنشاء السيشن ورفع الملف بنجاح',
@@ -95,4 +95,3 @@ public function storeSession(Request $request)
 }
 
 }
-
