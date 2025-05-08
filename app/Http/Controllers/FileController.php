@@ -22,7 +22,9 @@ class FileController extends Controller
         if ($request->hasFile('file')) {
             $uploadedFileUrl = Cloudinary::uploadFile(
                 $request->file('file')->getRealPath(), 
-                ['resource_type' => 'auto']
+                ['resource_type' => 'auto',
+                'type' => 'upload'
+                ]
             )->getSecurePath();
             $fileModel->file = $uploadedFileUrl;
         }
