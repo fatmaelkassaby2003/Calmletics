@@ -56,9 +56,10 @@ public function storeSession(Request $request)
         $file->getRealPath(),
         [
             'resource_type' => 'raw', 
-            'folder' => 'sessions/files' ,
-            'type'=>'upload',
-            'upload_preset' => 'public_raw' // اسم الـ unsigned preset
+            'folder' => 'sessions/files',
+            'type' => 'upload',
+            'upload_preset' => 'public_raw',
+            'access_mode' => 'public' // إضافة هذا السطر
         ]
     )->getSecurePath();
 
