@@ -10,7 +10,7 @@ class ComPre extends Model
     use HasFactory;
     protected $table = 'compres';
 
-    protected $fillable = ['id', 'name', 'level', 'code', 'plan_id', 'user_id','community_id'];
+    protected $fillable = ['id', 'name', 'level', 'code', 'plan_id', 'user_id'];
 
     public function user()
     {
