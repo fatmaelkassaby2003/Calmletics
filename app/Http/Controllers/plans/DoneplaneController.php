@@ -195,6 +195,16 @@ class DoneplaneController extends Controller
         $year = $request->year;
         $day = $request->day;
         $time = $request->time;
+        $booksession = DB::table('session_books')
+        ->where('year', $year)
+        ->where('day', $day)
+        ->where('time', $time)
+        ->first();
+        if($booksession){
+            return response()->json([
+                'message' => 'this session is already booked.'
+            ]);
+        }
         DB::table('session_books')->insert([
             'user_id' => $user->id,
             'session_id' => $session_id,
