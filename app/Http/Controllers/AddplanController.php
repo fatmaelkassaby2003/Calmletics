@@ -46,6 +46,8 @@ class AddplanController extends Controller
         'plan_id' => 'required|exists:plans,id',
         'file' => 'required|file|mimes:mp4,mp3,pdf|max:10240',
         'type' => 'required|string|max:255',
+        'task' => 'required|string|max:255',
+        'practical' => 'required|string|max:255',
     ]);
 
     $file = $request->file('file');
@@ -58,7 +60,9 @@ class AddplanController extends Controller
         'name' => $request->name,
         'content' => $uploadedFileUrl,
         'plan_id' => $request->plan_id,
-        'type' => $request->type
+        'type' => $request->type,
+        'task' => $request->task,
+        'practical' => $request->practical
     ]);
 
     return response()->json([
