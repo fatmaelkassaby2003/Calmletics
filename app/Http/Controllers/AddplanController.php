@@ -41,6 +41,7 @@ class AddplanController extends Controller
     
 public function storeSession(Request $request)
 {
+    // التحقق من صحة البيانات
     $request->validate([
         'name' => 'required|string|max:255',
         'plan_id' => 'required|exists:plans,id',
@@ -53,35 +54,37 @@ public function storeSession(Request $request)
     $file = $request->file('file');
     $extension = strtolower($file->getClientOriginalExtension());
 
-    // تحديد نوع المورد
-    $resourceType = 'raw';
+    // تحديد نوع المورد بناءً على الامتداد
+    $resourceType = 'raw'; // الافتراضي
     if (in_array($extension, ['mp4', 'mp3'])) {
         $resourceType = 'video';
     }
 
-    // رفع الملف بدون upload_preset لتفادي المشاكل
+    // رفع الملف إلى Cloudinary
     $uploadResult = Cloudinary::uploadFile(
         $file->getRealPath(),
         [
             'folder' => 'sessions/files',
+            'upload_preset' => 'public_raw',
             'resource_type' => $resourceType,
-            'use_filename' => true,
-            'unique_filename' => false,
-            'overwrite' => true,
+            'access_mode' => 'public',
+            'filename_override' => uniqid() . '.' . $extension
         ]
     );
 
-    $fileUrl = $uploadResult->getSecurePath();
-
-    // إنشاء السجل
     $session = Session::create([
         'name' => $request->name,
-        'content' => $fileUrl,
+        'content' => $uploadResult->getSecurePath(),
         'plan_id' => $request->plan_id,
         'type' => $request->type,
         'task' => $request->task,
         'practical' => $request->practical
     ]);
+
+    $fileUrl = $uploadResult->getSecurePath();
+    if (in_array($extension, ['pdf', 'txt'])) {
+        $fileUrl .= '?fl_attachment';
+    }
 
     return response()->json([
         'message' => 'تم إنشاء السيشن ورفع الملف بنجاح',
@@ -90,3 +93,4 @@ public function storeSession(Request $request)
 }
 
 }
+
