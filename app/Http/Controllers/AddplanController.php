@@ -41,7 +41,6 @@ class AddplanController extends Controller
     
 public function storeSession(Request $request)
 {
-    // التحقق من صحة البيانات
     $request->validate([
         'name' => 'required|string|max:255',
         'plan_id' => 'required|exists:plans,id',
@@ -54,29 +53,25 @@ public function storeSession(Request $request)
     $file = $request->file('file');
     $extension = strtolower($file->getClientOriginalExtension());
 
-    // تحديد نوع المورد (resource type)
+    // تحديد نوع المورد
     $resourceType = 'raw';
     if (in_array($extension, ['mp4', 'mp3'])) {
         $resourceType = 'video';
     }
 
-    // رفع الملف على Cloudinary
+    // رفع الملف بدون upload_preset لتفادي المشاكل
     $uploadResult = Cloudinary::uploadFile(
         $file->getRealPath(),
         [
             'folder' => 'sessions/files',
-            'upload_preset' => 'public_raw', // تأكد من أن preset يسمح بالرفع كـ raw
             'resource_type' => $resourceType,
-            'access_mode' => 'public',
-            'filename_override' => uniqid() . '.' . $extension
+            'use_filename' => true,
+            'unique_filename' => false,
+            'overwrite' => true,
         ]
     );
 
-    // تعديل الرابط إذا كان PDF أو TXT ليتم عرضه بشكل صحيح
     $fileUrl = $uploadResult->getSecurePath();
-    if (in_array($extension, ['pdf', 'txt'])) {
-        $fileUrl = str_replace('/image/upload/', '/raw/upload/', $fileUrl);
-    }
 
     // إنشاء السجل
     $session = Session::create([
@@ -93,6 +88,5 @@ public function storeSession(Request $request)
         'session' => $session,
     ], 201);
 }
-
 
 }
