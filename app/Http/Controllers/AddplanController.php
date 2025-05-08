@@ -39,7 +39,7 @@ class AddplanController extends Controller
 }
 
     
-    public function storeSession(Request $request)
+public function storeSession(Request $request)
 {
     $request->validate([
         'name' => 'required|string|max:255',
@@ -52,9 +52,13 @@ class AddplanController extends Controller
 
     $file = $request->file('file');
 
-    $uploadedFileUrl = Cloudinary::uploadFile($file->getRealPath(), [
-        'resource_type' => 'auto'
-    ])->getSecurePath();
+    $uploadedFileUrl = Cloudinary::uploadFile(
+        $file->getRealPath(),
+        [
+            'resource_type' => 'raw', 
+            'folder' => 'sessions/files' 
+        ]
+    )->getSecurePath();
 
     $session = Session::create([
         'name' => $request->name,
@@ -70,6 +74,5 @@ class AddplanController extends Controller
         'session' => $session,
     ]);
 }
-
 }
 
