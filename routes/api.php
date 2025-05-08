@@ -88,6 +88,8 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
     Route::post('/community/message/send', [WebSocketController::class, 'sendMessage']);
     Route::get('/community/messages', [WebSocketController::class, 'index']);
 
+    Route::post('/booksession', [DoneplaneController::class, 'booksession']);
+
 });
 
 Route::middleware(['jwt.auth'])->post('/updateimage', [ProfileController::class, 'updateimage']);
