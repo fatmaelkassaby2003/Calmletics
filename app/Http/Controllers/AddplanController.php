@@ -93,7 +93,6 @@ public function storeSession(Request $request)
     return response()->json([
         'message' => 'تم إنشاء السيشن ورفع الملف بنجاح',
         'session' => $session,
-        'file_url' => $fileUrl
     ], 201);
 }
 
