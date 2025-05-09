@@ -219,4 +219,68 @@ class DoneplaneController extends Controller
             'message' => 'booked session successfully.'
         ], 200);
     }
+    public function gettasks(Request $request)
+    {
+        $user = User::find(auth()->id());
+    
+        if ($user->com_free_id) {
+            $plan_id = $user->comFree->plan_id;
+        } elseif ($user->com_pre_id) {
+            $plan_id = $user->comPre->plan_id;
+        } elseif ($user->plan_id) {
+            $plan_id = $user->plan_id;
+        } else {
+            return response()->json([
+                'message' => "User doesn't have a plan ⏳"
+            ], 403);
+        }
+            $contents = DB::table('sessions')
+            ->where('plan_id', $plan_id)
+            ->orderBy('id')
+            ->get();
+    
+        if ($contents->isEmpty()) {
+            return response()->json([
+                'message' => 'No sessions found for this plan.'
+            ]);
+        }
+            $completedSessions = DB::table('doneplans')
+            ->where('user_id', $user->id)
+            ->where('done', true)
+            ->get();
+    
+        $sessions = [];
+        foreach ($contents as $session) {
+            $completedSession = $completedSessions->firstWhere('session_id', $session->id);
+            if ($completedSession) {
+                $sessions[] = [
+                    'session_id' => $session->id,
+                    'session_name' => $session->name,
+                    'task' => $session->task,
+                    'practical' => $session->practical,
+                    'feeling' => $completedSession->feeling,  
+                    'status' => 'done'
+                ];
+            } elseif (!isset($nextSession)) {
+                $nextSession = $session;
+            }
+        }
+        if (isset($nextSession)) {
+            $sessions[] = [
+                'session_id' => $nextSession->id,
+                'session_name' => $nextSession->name,
+                'task' => $nextSession->task,
+                'practical' => $nextSession->practical,
+                'feeling' => null,
+                'status' => 'active'
+            ];
+        }
+    
+        return response()->json([
+            'message' => 'All tasks:',
+            'tasks' => $sessions
+        ]);
+    }
+    
+     
 }

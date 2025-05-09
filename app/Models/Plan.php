@@ -12,9 +12,9 @@ class Plan extends Model
     protected $fillable = ['name', 'level',];
 
     public function sessions()
-{
-    return $this->hasMany(Session::class);
-}
+    {
+        return $this->hasMany(Session::class);
+    }
 
     public function comfree()
     {

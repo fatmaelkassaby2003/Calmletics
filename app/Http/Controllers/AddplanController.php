@@ -96,5 +96,41 @@ public function storeSession(Request $request)
     ], 201);
 }
 
+public function plans()
+{
+    $plans = Plan::select('id', 'level', 'name')
+        ->with(['sessions' => function ($query) {
+            $query->select('id', 'name', 'type_ai', 'plan_id');
+        }])
+        ->get()
+        ->map(function ($plan) {
+            return [
+                'plan_id' => $plan->id,
+                'name' => $plan->name,
+                'Anxiety level' => $plan->level,
+                'sessions' => $plan->sessions->map(function ($session) {
+                    return [
+                        'type' => $session->type_ai,
+                    ];
+                }),
+            ];
+        });
+
+    return response()->json($plans);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 

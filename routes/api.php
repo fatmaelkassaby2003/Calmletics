@@ -85,6 +85,8 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
     Route::post('/done', [DoneplaneController::class, 'updateProgress']); // تحديث التقدم
     Route::get('/get-sessions', [DoneplaneController::class, 'getsessions']);
     Route::get('/get-session-content', [DoneplaneController::class, 'getsession_content']);
+    Route::get('/get-tasks', [DoneplaneController::class, 'gettasks']);
+
 
     Route::post('/community/message/send', [WebSocketController::class, 'sendMessage']);
     Route::get('/community/messages', [WebSocketController::class, 'index']);
@@ -134,3 +136,4 @@ Route::post('/sessions/upload', [AddplanController::class, 'storeSession']);
 
 Route::post('/upload', [FileController::class, 'upload']);
 
+Route::get('/plans', [AddplanController::class, 'plans']);
