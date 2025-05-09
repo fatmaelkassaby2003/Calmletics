@@ -110,6 +110,7 @@ public function plans()
                 'Anxiety level' => $plan->level,
                 'sessions' => $plan->sessions->map(function ($session) {
                     return [
+                        'name' => $session->name,
                         'type' => $session->type_ai,
                     ];
                 }),
