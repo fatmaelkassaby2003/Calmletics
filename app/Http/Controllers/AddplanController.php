@@ -49,6 +49,7 @@ public function storeSession(Request $request)
         'type' => 'required|string|max:255',
         'task' => 'required|string|max:255',
         'practical' => 'required|string|max:255',
+        'type-ai' => 'required|string|max:255',
     ]);
 
     $file = $request->file('file');
@@ -79,7 +80,8 @@ public function storeSession(Request $request)
         'plan_id' => $request->plan_id,
         'type' => $request->type,
         'task' => $request->task,
-        'practical' => $request->practical
+        'practical' => $request->practical,
+        'type-ai' => $request->type_ai
     ]);
 
     // تعديل الرابط لتحميل ملفات معينة مباشرة (مثل PDF و TXT)

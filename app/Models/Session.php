@@ -9,7 +9,7 @@ class Session extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'plan_id','content','type','task','practical'];
+    protected $fillable = ['name', 'plan_id','content','type','task','practical','type-ai'];
 
 
 
