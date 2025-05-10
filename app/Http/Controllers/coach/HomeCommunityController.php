@@ -34,7 +34,7 @@ class HomeCommunityController extends Controller
 
     $data = $communities->map(function ($community) {
         return [
-            'id' => $community->id,
+            'community_id' => $community->id,
             'name' => $community->name,
             'level' => $community->level,
             'players_count' => $community->users_count,
