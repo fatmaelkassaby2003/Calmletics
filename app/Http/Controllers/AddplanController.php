@@ -120,18 +120,5 @@ public function plans()
     return response()->json($plans);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 

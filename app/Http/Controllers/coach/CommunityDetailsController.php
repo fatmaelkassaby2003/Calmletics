@@ -65,6 +65,7 @@ class CommunityDetailsController extends Controller
     return response()->json([
         'community_id' => $community->id,
         'community_name' => $community->name,
+        'community_level'=> $community->level,
         'community_code' => $community->code,
         'community_level' => $community->level,
         'players_count' => $playersCount,
