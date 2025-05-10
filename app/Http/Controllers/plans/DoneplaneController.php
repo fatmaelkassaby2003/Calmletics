@@ -143,7 +143,7 @@ class DoneplaneController extends Controller
             $numberedList[] = [
                 'session_id' => $session->id,
                 'session_name' => $session->name,
-                'session_content' => $session->type,
+                'session_type' => $session->type,
                 'session_number' => "Session $order",
                 'status' => $status,
             ];
