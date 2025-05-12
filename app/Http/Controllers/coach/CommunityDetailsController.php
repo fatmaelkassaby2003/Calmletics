@@ -131,7 +131,7 @@ public function getCommunityPlayersStatus(Request $request)
             $statusImage = asset('front/images/vector.png');
         } else {
             $statusMessage = 'Player ' . $player->name . ' hasn’t logged progress in the last 3 days';
-            $statusImage = asset('front/images/icon.png');
+            $statusImage = asset('front/images/icon1.png');
         }
 
         return [
