@@ -67,29 +67,6 @@ class PlandatesController extends Controller
         ], 200);
     }
 
-
-    public function assignPlanToCurrentUser(Request $request)
-    {
-        $request->validate([
-            'plan_id' => 'required|exists:plans,id',
-        ]);
-    
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        
-        if (!$user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
-    
-        $user->update([
-            'plan_id' => $request->plan_id
-        ]);
-    
-        return response()->json([
-            'message' => 'Plan assigned successfully',
-            'user' => $user->fresh(),
-        ]);
-    }
 }
 
 
