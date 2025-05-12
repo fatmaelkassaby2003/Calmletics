@@ -100,4 +100,27 @@ public function getUserAnswer()
         'Online_Interaction_Over_Offline' => $answer->Online_Interaction_Over_Offline,
     ], 200);
 }
+
+public function getrecommendationanswers()
+{
+    $user = auth()->user();
+
+    if (!$user) {
+        return response()->json(['error' => 'Unauthorized. Token might be invalid or expired.'], 401);
+    }
+
+    $answer = Answer::where('user_id', $user->id)->first();
+
+    if (!$answer) {
+        return response()->json(['message' => 'No answer found for this user'], 404);
+    }
+
+    return response()->json([
+
+        'anxiety_level' => $answer->anxiety_level,
+        'Preferred_Content' => $answer->Preferred_Content,
+        'Daily_App_Usage' => $answer->Daily_App_Usage,
+    ], 200);
 }
+}
+

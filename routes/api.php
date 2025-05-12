@@ -80,6 +80,8 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
     Route::get('/score', [ProfileController::class, 'score']);
     Route::post('/answers', [AnswerController::class, 'storeAnswers']);
     Route::get('/getanswers', [AnswerController::class, 'getUserAnswer']);
+    Route::get('/get_recommendation_answers', [AnswerController::class, 'getrecommendationanswers']);
+
 
     Route::post('/done', [DoneplaneController::class, 'updateProgress']); // تحديث التقدم
     Route::get('/get-sessions', [DoneplaneController::class, 'getsessions']);
