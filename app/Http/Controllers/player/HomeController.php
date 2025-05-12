@@ -97,6 +97,7 @@ class HomeController extends Controller
 {
     $request->validate([
         'cluster' => 'required|numeric',
+        'recommended_plan_id' => 'required|numeric',
     ]);
 
     $user = User::find(auth()->id());
@@ -106,6 +107,7 @@ class HomeController extends Controller
     }
 
     $user->cluster = $request->cluster;
+    $user->plan_id = $request->recommended_plan_id;
     $user->save();
 
     return response()->json([
