@@ -76,14 +76,14 @@ public function getCoachPlayersStatus(Request $request)
                 $daysSinceDone = null;
             }
 
-            if ($statusFilter === 'achievements' && $daysSinceDone <= 2) {
-                return true; 
+            if ($statusFilter === 'achievements') {
+                return !is_null($daysSinceDone) && $daysSinceDone <= 2;
             }
-
-            if ($statusFilter === 'missed' && ($daysSinceDone > 2 || is_null($daysSinceDone))) {
-                return true; 
+            
+            if ($statusFilter === 'missed') {
+                return is_null($daysSinceDone) || $daysSinceDone > 2;
             }
-
+            
             return false;
         });
     } else {

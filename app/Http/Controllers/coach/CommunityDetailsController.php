@@ -95,7 +95,7 @@ public function getCommunityPlayersStatus(Request $request)
 
     $playersQuery = User::where('com_pre_id', $community->id);
 
-    if ($statusFilter) {
+    if ($$statusFilter && $statusFilter !== 'all') {
         $playersQuery = $playersQuery->get()->filter(function ($player) use ($now, $statusFilter) {
             $lastDone = Doneplan::where('user_id', $player->id)
                 ->where('done', true)
@@ -104,14 +104,14 @@ public function getCommunityPlayersStatus(Request $request)
 
             $daysSinceDone = $lastDone ? $lastDone->created_at->diffInDays($now) : null;
 
-            if ($statusFilter === 'achievements' && $daysSinceDone <= 2) {
-                return true;
+            if ($statusFilter === 'achievements') {
+                return !is_null($daysSinceDone) && $daysSinceDone <= 2;
             }
-
-            if ($statusFilter === 'missed' && ($daysSinceDone > 2 || is_null($daysSinceDone))) {
-                return true;
+            
+            if ($statusFilter === 'missed') {
+                return is_null($daysSinceDone) || $daysSinceDone > 2;
             }
-
+            
             return false;
         });
     } else {
