@@ -63,7 +63,7 @@ public function getCoachPlayersStatus(Request $request)
 
     $now = \Carbon\Carbon::now();
 
-    if ($statusFilter) {
+    if ($statusFilter && $statusFilter !== 'all') {
         $playersQuery = $playersQuery->get()->filter(function ($player) use ($now, $statusFilter) {
             $lastDone = Doneplan::where('user_id', $player->id)
                 ->where('done', true)
