@@ -95,7 +95,7 @@ public function getCommunityPlayersStatus(Request $request)
 
     $playersQuery = User::where('com_pre_id', $community->id);
 
-    if ($$statusFilter && $statusFilter !== 'all') {
+    if ($statusFilter && $statusFilter !== 'all') {
         $playersQuery = $playersQuery->get()->filter(function ($player) use ($now, $statusFilter) {
             $lastDone = Doneplan::where('user_id', $player->id)
                 ->where('done', true)
