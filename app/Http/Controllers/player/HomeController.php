@@ -97,7 +97,6 @@ class HomeController extends Controller
 {
     $request->validate([
         'cluster' => 'required|numeric',
-        'recommended_plan_id' => 'required|numeric',
     ]);
 
     $user = User::find(auth()->id());
@@ -107,7 +106,6 @@ class HomeController extends Controller
     }
 
     $user->cluster = $request->cluster;
-    $user->plan_id = $request->recommended_plan_id;
     $user->save();
 
     return response()->json([
@@ -115,11 +113,34 @@ class HomeController extends Controller
         'user' => [
             'id' => $user->id,
             'cluster' => $user->cluster,
-            'plan_id' => $user->plan_id,
         ]
     ], 200);
 }
 
+
+public function recommended(Request $request)
+{
+    $request->validate([
+        'recommended_plan_id' => 'required|numeric',
+    ]);
+
+    $user = User::find(auth()->id());
+
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $user->plan_id = $request->recommended_plan_id;
+    $user->save();
+
+    return response()->json([
+        'message' => 'Plan updated successfully',
+        'user' => [
+            'id' => $user->id,
+            'plan_id' => $user->plan_id,
+        ]
+    ], 200);
+}
 
 
 }
