@@ -21,7 +21,6 @@ class DoneplaneController extends Controller
     
         $request->validate([
             'session_id' => 'required|integer',
-            'feeling' => 'required|string|max:255',
             'note' => 'nullable|string|max:1000',
         ]);
     
@@ -55,7 +54,6 @@ class DoneplaneController extends Controller
             'plan_id' => $plan_id,
             'session_id' => $session_number,
             'done' => true,
-            'feeling' => $request->feeling,
             'note' => $request->note,
             'created_at' => now(),
             'updated_at' => now(),
@@ -143,6 +141,7 @@ class DoneplaneController extends Controller
             $numberedList[] = [
                 'session_id' => $session->id,
                 'session_name' => $session->name,
+                'session_type' => $session->type,
                 'session_number' => "Session $order",
                 'status' => $status,
             ];

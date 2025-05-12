@@ -66,7 +66,6 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
     Route::post('/flag', [HomeController::class, 'flag']);
     Route::post('cluster', [HomeController::class, 'Cluster']);
 
-
     Route::get('/join', [FreeCommunityController::class, 'join']);
     Route::get('/community', [FreeCommunityController::class, 'community']);
     Route::get('/leaderboard', [FreeCommunityController::class, 'leaderboard']);
