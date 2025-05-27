@@ -343,7 +343,6 @@ class DoneplaneController extends Controller
 
     return response()->json([
         'your plan' => [
-            'session_id' => $session->id,
             'session_number' => $sessionNumber,
             'session_name' => $nextSession->name,
             'Percentage' => round($percentage, 2) . ' %'  
