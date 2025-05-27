@@ -90,6 +90,7 @@ Route::middleware(['jwt.auth'])->prefix('player')->group(function () {
     Route::get('/get-sessions', [DoneplaneController::class, 'getsessions']);
     Route::get('/get-session-content', [DoneplaneController::class, 'getsession_content']);
     Route::get('/get-tasks', [DoneplaneController::class, 'gettasks']);
+    Route::get('/get-progress', [DoneplaneController::class, 'getProgress']);
 
 
     Route::post('/community/message/send', [WebSocketController::class, 'sendMessage']);

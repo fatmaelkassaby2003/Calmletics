@@ -280,6 +280,77 @@ class DoneplaneController extends Controller
             'tasks' => $sessions
         ]);
     }
-    
-     
+    public function getProgress(Request $request)
+{
+
+    $user = User::find(auth()->id());
+
+    if ($user->com_free_id) {
+        $plan_id = $user->comFree->plan_id;
+    } elseif ($user->com_pre_id) {
+        $plan_id = $user->comPre->plan_id;
+    } elseif ($user->plan_id) {
+        $plan_id = $user->plan_id;
+    } else {
+        return response()->json([
+            'message' => "User doesn't have a plan ⏳"
+        ], 403);
+    }
+
+    // جلب الجلسات مرتبة حسب id زي ما في getsessions
+    $sessions = DB::table('sessions')
+        ->where('plan_id', $plan_id)
+        ->orderBy('id')
+        ->get();
+
+    if ($sessions->isEmpty()) {
+        return response()->json([
+            'message' => 'No sessions found for this plan.'
+        ]);
+    }
+
+    // جلب الجلسات المنتهية
+    $completedSessionIds = DB::table('doneplans')
+        ->where('user_id', $user->id)
+        ->where('done', true)
+        ->pluck('session_id')
+        ->toArray();
+
+    $nextSession = null;
+    $sessionNumber = null;
+
+    foreach ($sessions as $index => $session) {
+        if (!in_array($session->id, $completedSessionIds)) {
+            $nextSession = $session;
+            $sessionNumber = $index + 1; // نفس منطق getsessions
+            break;
+        }
+    }
+
+    if (!$nextSession) {
+        return response()->json([
+            'message' => 'This plan has already been completed.'
+        ]);
+    }
+
+    // حساب نسبة التقدم
+    $total = $sessions->count();
+    $completed = count($completedSessionIds);
+    $percentage = $total > 0 ? ($completed / $total) * 100 : 0;
+
+    $user->Percentage = $percentage;
+    $user->save();
+
+    return response()->json([
+        'your plan' => [
+            'session_number' => $sessionNumber,
+            'session_name' => $nextSession->name,
+            'Percentage' => round($percentage, 2) . ' %'  
+        ],
+        "task's today" => [
+           'progress' =>  "$completed of $total tasks completed",
+            'Percentage' => round($percentage, 2) . ' %'  
+        ],       
+    ]);
+}    
 }

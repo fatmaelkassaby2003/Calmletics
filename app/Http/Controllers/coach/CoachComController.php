@@ -171,62 +171,84 @@ class CoachComController extends Controller
     }
     
     public function leaderboard(Request $request)
-    {
-        $user = User::find(auth()->id());
-        $time = $request->time;
-        $community_id = $request->community_id;
-        $community = ComPre::find($community_id);
-        if (!$community) {
-            return response()->json(['error' => 'community not found'], 403);
+{
+    $user = User::find(auth()->id());
+    $time = $request->time;
+    $community_id = $request->community_id;
+    $community = ComPre::find($community_id);
+
+    if (!$community) {
+        return response()->json(['error' => 'community not found'], 403);
+    }
+
+    // دالة لإضافة الترتيب وتقسيم اللاعبين إلى top3 و others
+    $addRankAndSplit = function ($collection) {
+        $collection = $collection->values();
+        foreach ($collection as $index => $item) {
+            $item->rank = $index + 1;
         }
-        $addRank = function ($collection) {
-            $collection = $collection->values(); 
-            foreach ($collection as $index => $item) {
-                $item->rank = $index + 1;
-            }
-            return $collection;
-        };
-            $topUsersByDay = DB::table('users')
-            ->leftJoin('plandates', function ($join) {
-                $join->on('users.id', '=', 'plandates.user_id')
-                    ->whereDate('plandates.date', now()->toDateString());})
-            ->select('users.name', 'users.image', 'users.flag', 'users.com_pre_id','users.id as user_id',
-                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
-            ->where('users.com_pre_id', $community_id)
-            ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_pre_id')
-            ->orderByDesc('total_score')
-            ->get();
-        $topUsersByDay = $addRank($topUsersByDay);
-    
-        $topUsersByWeek = DB::table('users')
-            ->leftJoin('plandates', function ($join) {
-                $join->on('users.id', '=', 'plandates.user_id')
-                    ->whereBetween('plandates.date', [now()->startOfWeek(), now()->endOfWeek()]);
-            })
-            ->select('users.name', 'users.image', 'users.flag', 'users.com_pre_id','users.id as user_id',
-                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
-            ->where('users.com_pre_id', $community_id)
-            ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_pre_id')
-            ->orderByDesc('total_score')
-            ->get();
-    
-        $topUsersByWeek = $addRank($topUsersByWeek);
-            $topUsersAllTime = DB::table('users')
-            ->leftJoin('plandates', 'users.id', '=', 'plandates.user_id')
-            ->select('users.name', 'users.image', 'users.flag', 'users.com_pre_id','users.id as user_id',
-                DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
-            ->where('users.com_pre_id', $community_id)
-            ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_pre_id')
-            ->orderByDesc('total_score')
-            ->get();
-        $topUsersAllTime = $addRank($topUsersAllTime);
-            if ($time === 'daily') {
-            return response()->json(['users' => $topUsersByDay]);
-        } elseif ($time === 'weekly') {
-            return response()->json(['users' => $topUsersByWeek]);
-        } else {
-            return response()->json(['users' => $topUsersAllTime]);
-        }
-    }     
+        return [
+            'top3' => $collection->take(3),
+            'others' => $collection->slice(3)->values()
+        ];
+    };
+
+    // daily
+    $topUsersByDay = DB::table('users')
+        ->leftJoin('plandates', function ($join) {
+            $join->on('users.id', '=', 'plandates.user_id')
+                ->whereDate('plandates.date', now()->toDateString());
+        })
+        ->select('users.name', 'users.image', 'users.flag', 'users.com_pre_id', 'users.id as user_id',
+            DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
+        ->where('users.com_pre_id', $community_id)
+        ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_pre_id')
+        ->orderByDesc('total_score')
+        ->get();
+    $topUsersByDay = $addRankAndSplit($topUsersByDay);
+
+    // weekly
+    $topUsersByWeek = DB::table('users')
+        ->leftJoin('plandates', function ($join) {
+            $join->on('users.id', '=', 'plandates.user_id')
+                ->whereBetween('plandates.date', [now()->startOfWeek(), now()->endOfWeek()]);
+        })
+        ->select('users.name', 'users.image', 'users.flag', 'users.com_pre_id', 'users.id as user_id',
+            DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
+        ->where('users.com_pre_id', $community_id)
+        ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_pre_id')
+        ->orderByDesc('total_score')
+        ->get();
+    $topUsersByWeek = $addRankAndSplit($topUsersByWeek);
+
+    // all time
+    $topUsersAllTime = DB::table('users')
+        ->leftJoin('plandates', 'users.id', '=', 'plandates.user_id')
+        ->select('users.name', 'users.image', 'users.flag', 'users.com_pre_id', 'users.id as user_id',
+            DB::raw('COALESCE(SUM(plandates.score), 0) as total_score'))
+        ->where('users.com_pre_id', $community_id)
+        ->groupBy('users.id', 'users.name', 'users.image', 'users.flag', 'users.com_pre_id')
+        ->orderByDesc('total_score')
+        ->get();
+    $topUsersAllTime = $addRankAndSplit($topUsersAllTime);
+
+    if ($time === 'daily') {
+        return response()->json([
+            'top3' => $topUsersByDay['top3'],
+            'others' => $topUsersByDay['others']
+        ]);
+    } elseif ($time === 'weekly') {
+        return response()->json([
+            'top3' => $topUsersByWeek['top3'],
+            'others' => $topUsersByWeek['others']
+        ]);
+    } else {
+        return response()->json([
+            'top3' => $topUsersAllTime['top3'],
+            'others' => $topUsersAllTime['others']
+        ]);
+    }
+}
+   
 }
 
