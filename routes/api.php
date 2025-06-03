@@ -138,6 +138,7 @@ Route::middleware(['jwt.auth'])->prefix('file')->group(function () {
 
 Route::post('/plans/upload', [AddplanController::class, 'storePlan']);
 Route::post('/sessions/upload', [AddplanController::class, 'storeSession']);
+Route::post('/sessions/update', [AddplanController::class, 'updateSession']);
 
 Route::post('/upload', [FileController::class, 'upload']);
 

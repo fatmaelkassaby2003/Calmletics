@@ -119,6 +119,74 @@ public function plans()
 
     return response()->json($plans);
 }
+public function updateSession(Request $request)
+{
+    // البحث عن السيشن
+    $session = Session::findOrFail($request->id);
+
+    // التحقق من صحة البيانات
+    $request->validate([
+        'name' => 'sometimes|required|string|max:255',
+        'task' => 'sometimes|required|string|max:255',
+        'practical' => 'sometimes|required|string|max:255',
+        'file' => 'sometimes|file|mimes:mp4,mp3,pdf,txt|max:10240',
+    ]);
+
+    // تحديث الاسم إذا وُجد
+    if ($request->has('name')) {
+        $session->name = $request->name;
+    }
+
+    // تحديث المهمة إذا وُجدت
+    if ($request->has('task')) {
+        $session->task = $request->task;
+    }
+
+    // تحديث الجزء العملي إذا وُجد
+    if ($request->has('practical')) {
+        $session->practical = $request->practical;
+    }
+
+    // رفع ملف جديد إلى Cloudinary إذا تم رفع ملف
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        $resourceType = 'raw'; // الافتراضي
+        if (in_array($extension, ['mp4', 'mp3'])) {
+            $resourceType = 'video';
+        }
+
+        $uploadResult = Cloudinary::uploadFile(
+            $file->getRealPath(),
+            [
+                'folder' => 'sessions/files',
+                'upload_preset' => 'public_raw',
+                'resource_type' => $resourceType,
+                'access_mode' => 'public',
+                'filename_override' => uniqid() . '.' . $extension
+            ]
+        );
+
+        // تعديل الرابط لتحميل ملفات معينة مباشرة (مثل PDF و TXT)
+        $fileUrl = $uploadResult->getSecurePath();
+        if (in_array($extension, ['pdf', 'txt'])) {
+            $fileUrl .= '?fl_attachment';
+        }
+
+        // تحديث رابط المحتوى
+        $session->content = $fileUrl;
+    }
+
+    // حفظ التغييرات
+    $session->save();
+
+    return response()->json([
+        'message' => 'تم تحديث بيانات السيشن بنجاح',
+        'session' => $session,
+    ]);
+}
+
 
 }
 
