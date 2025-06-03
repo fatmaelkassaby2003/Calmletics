@@ -119,12 +119,10 @@ public function plans()
 
     return response()->json($plans);
 }
-public function updateSession(Request $request)
+public function updateSession(Request $request, $id)
 {
-    // البحث عن السيشن
-    $session = Session::findOrFail($request->id);
+    $session = Session::findOrFail($id);
 
-    // التحقق من صحة البيانات
     $request->validate([
         'name' => 'sometimes|required|string|max:255',
         'task' => 'sometimes|required|string|max:255',
@@ -135,34 +133,42 @@ public function updateSession(Request $request)
     if ($request->has('name')) {
         $session->name = $request->name;
     }
+
     if ($request->has('task')) {
         $session->task = $request->task;
     }
+
     if ($request->has('practical')) {
         $session->practical = $request->practical;
     }
+
     if ($request->hasFile('file')) {
         $file = $request->file('file');
         $extension = strtolower($file->getClientOriginalExtension());
 
+        $resourceType = 'raw';
+        if (in_array($extension, ['mp4', 'mp3'])) {
+            $resourceType = 'video';
+        }
 
-    $resourceType = 'raw'; // الافتراضي
-    if (in_array($extension, ['mp4', 'mp3'])) {
-        $resourceType = 'video';
-    }
+        $uploadResult = Cloudinary::uploadFile(
+            $file->getRealPath(),
+            [
+                'folder' => 'sessions/files',
+                'upload_preset' => 'public_raw',
+                'resource_type' => $resourceType,
+                'access_mode' => 'public',
+                'filename_override' => uniqid() . '.' . $extension
+            ]
+        );
 
-    $uploadResult = Cloudinary::uploadFile(
-        $file->getRealPath(),
-        [
-            'folder' => 'sessions/files',
-            'upload_preset' => 'public_raw',
-            'resource_type' => $resourceType,
-            'access_mode' => 'public',
-            'filename_override' => uniqid() . '.' . $extension
-        ]
-    );
+        // 👇 تعديل الرابط بشكل صحيح قبل التخزين
+        $fileUrl = $uploadResult->getSecurePath();
+        if (in_array($extension, ['pdf', 'txt'])) {
+            $fileUrl .= '?fl_attachment';
+        }
 
-        $session->content = $uploadResult->getSecurePath();
+        $session->content = $fileUrl; 
     }
 
     $session->save();
@@ -172,6 +178,7 @@ public function updateSession(Request $request)
         'session' => $session,
     ]);
 }
+
 
 
 }
