@@ -119,9 +119,9 @@ public function plans()
 
     return response()->json($plans);
 }
-public function updateSession(Request $requestd)
+public function updateSession(Request $request)
 {
-    $session = Session::findOrFail($requestd->id);
+    $session = Session::findOrFail($request->id);
 
     $request->validate([
         'name' => 'sometimes|required|string|max:255',
