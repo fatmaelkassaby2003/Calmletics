@@ -130,7 +130,16 @@ public function recommended(Request $request)
         return response()->json(['message' => 'User not found'], 404);
     }
 
-    $user->plan_id = $request->recommended_plan_id;
+    $recommendedPlanId = $request->recommended_plan_id;
+
+    if ($recommendedPlanId < 10) {
+        $user->plan_id = 1;
+    } elseif ($recommendedPlanId >= 10 && $recommendedPlanId <= 18) {
+        $user->plan_id = 10;
+    } else {
+        $user->plan_id = 19;
+    }
+
     $user->save();
 
     return response()->json([

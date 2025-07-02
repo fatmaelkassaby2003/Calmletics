@@ -83,11 +83,20 @@ class CoachComController extends Controller
         do {
             $code = rand(1000, 9999);
         } while (ComPre::where('code', $code)->exists());
-    
+        
+        $planid = 1 ;
+
+        if ($request->plan_id < 10) {
+            $planid = 1;
+        } elseif ($request->plan_id >= 10 && $request->plan_id <= 18) {
+            $planid = 10;
+        } else {
+            $planid = 19;
+        }
         $compre = ComPre::create([
             'name' => $request->name,
             'level' => $request->level,
-            'plan_id' => $request->plan_id,
+            'plan_id' => $planid,
             'code' => $code,
             'user_id' => Auth::id(), 
         ]);
@@ -181,7 +190,6 @@ class CoachComController extends Controller
         return response()->json(['error' => 'community not found'], 403);
     }
 
-    // دالة لإضافة الترتيب وتقسيم اللاعبين إلى top3 و others
     $addRankAndSplit = function ($collection) {
         $collection = $collection->values();
         foreach ($collection as $index => $item) {
