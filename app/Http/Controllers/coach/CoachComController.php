@@ -125,8 +125,8 @@ class CoachComController extends Controller
     
         $sessionsData = $sessions->values()->map(function ($session, $index) {
             $lower = strtolower($session->content);
-            $type = 'unknown';
-            $icon = '';
+            $type = 'article';
+            $icon = asset('front/images/subtitle.png') ;
     
             if (preg_match('/\.(mp4|mov|avi|mkv)|youtube\.com|vimeo\.com/', $lower)) {
                 $type = 'video';
